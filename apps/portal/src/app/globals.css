@@ -107,3 +107,4 @@ tbody tr:hover { background: color-mix(in srgb, var(--accent-soft) 45%, transpar
 .inline-form { display: flex; gap: 8px; flex-wrap: wrap; align-items: end; }
 .inline-form input { width: 120px; }
 .inline-form input[name="sourceUrl"] { width: 260px; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
