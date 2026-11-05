@@ -1,0 +1,945 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>[hidden]{display:none!important}body{margin:0}</style></head><body>
+<title>Lanka Ready Prototype</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Young+Serif&display=swap">
+<style>
+/* Layout: desktop shows the tourist phone (left) beside the staff portal (right); phones show one at a time, the app full-screen. */
+:root {
+  --bg: #eef2ee;
+  --surface: #ffffff;
+  --sunk: #f6f8f5;
+  --fg: #17231c;
+  --muted: #56645b;
+  --line: #d9e1da;
+  --accent: #165a3c;
+  --accent-fg: #ffffff;
+  --accent-soft: #e3efe7;
+  --warn: #8a4b06;
+  --warn-soft: #fbf0df;
+  --danger: #a61b1b;
+  --danger-soft: #fbe5e5;
+  --info: #1d4ed8;
+  --info-soft: #e6edfd;
+  --frame: #1b2420;
+  --shadow: 0 1px 2px rgb(23 35 28 / 6%), 0 8px 24px rgb(23 35 28 / 8%);
+  --display: "Young Serif", Georgia, serif;
+  --body: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e1411; --surface: #172019; --sunk: #121a15; --fg: #e6eee8; --muted: #9eada3; --line: #2a372e;
+    --accent: #7fd1a4; --accent-fg: #0e1411; --accent-soft: #1c2e23; --warn: #f5c27a; --warn-soft: #2e2416;
+    --danger: #f19999; --danger-soft: #3a1c1c; --info: #9db8ff; --info-soft: #1b2440; --frame: #000000;
+    --shadow: 0 1px 2px rgb(0 0 0 / 30%), 0 8px 24px rgb(0 0 0 / 35%);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e1411; --surface: #172019; --sunk: #121a15; --fg: #e6eee8; --muted: #9eada3; --line: #2a372e;
+  --accent: #7fd1a4; --accent-fg: #0e1411; --accent-soft: #1c2e23; --warn: #f5c27a; --warn-soft: #2e2416;
+  --danger: #f19999; --danger-soft: #3a1c1c; --info: #9db8ff; --info-soft: #1b2440; --frame: #000000;
+  --shadow: 0 1px 2px rgb(0 0 0 / 30%), 0 8px 24px rgb(0 0 0 / 35%);
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 15px; line-height: 1.5;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+h1, h2, h3 { margin: 0; line-height: 1.25; text-wrap: balance; }
+p { margin: 0; }
+.muted { color: var(--muted); }
+
+/* ---------- Demo chrome ---------- */
+.top { max-width: 1320px; margin: 0 auto; padding-block: 18px 12px; display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: center; justify-content: space-between; }
+.brand { display: grid; gap: 2px; }
+.brand h1 { font-family: var(--display); font-weight: 400; font-size: 1.5rem; }
+.brand p { color: var(--muted); font-size: 0.9rem; }
+.controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.seg { display: inline-flex; background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 3px; }
+.seg button { border: 0; background: none; padding: 6px 14px; border-radius: 999px; font-weight: 600; font-size: 0.9rem; color: var(--muted); }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-fg); }
+.ghost { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 6px 14px; font-weight: 600; font-size: 0.9rem; }
+.guide { max-width: 1320px; margin: 0 auto 16px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px 16px; display: flex; flex-wrap: wrap; gap: 8px 20px; align-items: baseline; font-size: 0.9rem; }
+.guide strong { font-size: 0.78rem; letter-spacing: .07em; text-transform: uppercase; color: var(--muted); }
+.guide ol { margin: 0; padding-left: 18px; display: flex; flex-wrap: wrap; gap: 4px 26px; }
+.stage { max-width: 1320px; margin: 0 auto; padding-bottom: 40px; display: grid; grid-template-columns: 400px minmax(0, 1fr); gap: 28px; align-items: start; }
+.stage[data-view="app"] { grid-template-columns: 400px; justify-content: center; }
+.stage[data-view="portal"] { grid-template-columns: minmax(0, 1fr); }
+.stage[data-view="app"] .portal-wrap, .stage[data-view="portal"] .phone-wrap { display: none; }
+.pane-label { font-size: 0.75rem; letter-spacing: .08em; text-transform: uppercase; font-weight: 700; color: var(--muted); margin-bottom: 8px; }
+
+/* ---------- Phone frame ---------- */
+.phone-wrap { position: sticky; top: 12px; }
+.device { width: 400px; height: 820px; max-height: calc(100vh - 60px); min-height: 640px; background: var(--frame); border-radius: 46px; padding: 12px; box-shadow: var(--shadow); }
+.screen { position: relative; height: 100%; background: var(--sunk); border-radius: 36px; overflow: hidden; display: flex; flex-direction: column; }
+.statusbar { height: 40px; flex: none; display: flex; align-items: center; justify-content: space-between; padding: 0 26px; font-size: 0.82rem; font-weight: 700; }
+.statusbar .notch { width: 110px; height: 26px; border-radius: 14px; background: var(--frame); }
+.app { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+.app-head { flex: none; display: flex; align-items: center; gap: 10px; padding: 6px 18px 10px; min-height: 44px; }
+.app-head .back { border: 0; background: none; color: var(--accent); font-weight: 600; padding: 4px 0; }
+.app-head .title { font-weight: 700; flex: 1; }
+.app-head .link { border: 0; background: none; color: var(--accent); font-weight: 600; font-size: 0.9rem; }
+.app-body { flex: 1; min-height: 0; overflow-y: auto; padding: 4px 20px 24px; display: flex; flex-direction: column; gap: 14px; }
+.tabbar { flex: none; display: grid; grid-template-columns: 1fr 1fr; border-top: 1px solid var(--line); background: var(--surface); padding-bottom: 10px; }
+.tabbar button { border: 0; background: none; padding: 10px 0 4px; display: grid; justify-items: center; gap: 2px; font-size: 0.75rem; font-weight: 600; color: var(--muted); position: relative; }
+.tabbar button[aria-current="page"] { color: var(--accent); }
+.tabbar svg { width: 22px; height: 22px; }
+.tabbar .dot { position: absolute; top: 6px; left: calc(50% + 8px); width: 9px; height: 9px; border-radius: 50%; background: var(--danger); }
+
+.a-title { font-size: 1.6rem; font-weight: 700; letter-spacing: -0.01em; }
+.a-label { font-size: 0.75rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+.field { display: grid; gap: 6px; }
+.field input, .field select, .field textarea { width: 100%; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 12px; font-size: 16px; min-width: 0; }
+.field textarea { min-height: 80px; resize: vertical; }
+.field .hint { font-size: 0.82rem; color: var(--muted); }
+.field .err, .err { font-size: 0.85rem; color: var(--danger); }
+.btn { border: 0; border-radius: 12px; padding: 14px; font-weight: 600; font-size: 1rem; background: var(--accent); color: var(--accent-fg); width: 100%; }
+.btn:disabled { opacity: .42; cursor: not-allowed; }
+.btn.soft { background: var(--accent-soft); color: var(--accent); }
+.btn.danger { background: var(--danger-soft); color: var(--danger); }
+.yesno { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.yesno button { border: 1px solid var(--line); background: var(--surface); border-radius: 10px; padding: 11px; font-weight: 500; }
+.yesno button[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); font-weight: 700; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 16px; display: grid; gap: 8px; }
+.card.good { background: var(--accent-soft); border-color: transparent; }
+.card.warn { background: var(--warn-soft); border-color: transparent; }
+.card h3 { font-size: 1.08rem; }
+.card p { color: var(--muted); font-size: 0.93rem; }
+.slot { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 12px; display: grid; gap: 8px; }
+.slot-head { display: flex; justify-content: space-between; font-weight: 600; }
+.slot-head .ok { color: var(--accent); font-size: 0.85rem; }
+.slot img { width: 100%; height: 130px; object-fit: cover; border-radius: 8px; background: var(--sunk); }
+.slot-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.slot-btns label, .slot-btns button { border: 0; border-radius: 10px; padding: 10px; background: var(--accent-soft); color: var(--accent); font-weight: 600; text-align: center; font-size: 0.9rem; cursor: pointer; }
+.slot-btns input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+.list-row { width: 100%; text-align: left; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px; display: flex; gap: 12px; align-items: center; }
+.list-row .grow { flex: 1; min-width: 0; display: grid; gap: 2px; }
+.list-row small { color: var(--muted); }
+.pill { display: inline-flex; align-items: center; gap: 6px; font-size: 0.78rem; font-weight: 700; padding: 3px 10px; border-radius: 999px; background: var(--sunk); color: var(--fg); white-space: nowrap; width: fit-content; }
+.pill::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; opacity: .7; }
+.pill.submitted { background: var(--info-soft); color: var(--info); }
+.pill.in_review, .pill.completed { background: var(--accent-soft); color: var(--accent); }
+.pill.needs_info { background: var(--warn-soft); color: var(--warn); }
+.pill.rejected, .pill.cancelled { color: var(--muted); }
+.timeline { list-style: none; margin: 0; padding: 0; display: grid; }
+.timeline li { position: relative; padding: 0 0 16px 22px; display: grid; gap: 2px; }
+.timeline li::before { content: ""; position: absolute; left: 4px; top: 6px; width: 10px; height: 10px; border-radius: 50%; background: var(--line); }
+.timeline li:last-child::before { background: var(--accent); }
+.timeline li::after { content: ""; position: absolute; left: 8px; top: 18px; bottom: 0; width: 2px; background: var(--line); }
+.timeline li:last-child::after { display: none; }
+.timeline .when { font-size: 0.8rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.timeline .note { background: var(--warn-soft); border-radius: 8px; padding: 6px 10px; margin-top: 4px; font-size: 0.92rem; }
+.thumbs { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 8px; }
+.thumb { border: 1px solid var(--line); background: var(--surface); border-radius: 10px; overflow: hidden; padding: 0; display: grid; text-align: left; }
+.thumb img { width: 100%; height: 72px; object-fit: cover; display: block; background: var(--sunk); }
+.thumb span { padding: 5px 8px; font-size: 0.75rem; font-weight: 600; }
+.notif { position: absolute; left: 10px; right: 10px; top: 44px; z-index: 5; background: var(--surface); border-radius: 18px; box-shadow: var(--shadow); padding: 12px 14px; display: grid; grid-template-columns: 34px 1fr; gap: 10px; align-items: start; border: 1px solid var(--line); text-align: left; animation: drop .35s ease; }
+.notif .icon { width: 34px; height: 34px; border-radius: 9px; background: var(--accent); display: grid; place-items: center; color: var(--accent-fg); font-weight: 700; font-family: var(--display); }
+.notif b { display: block; font-size: 0.92rem; }
+.notif span { font-size: 0.88rem; color: var(--muted); }
+.notif small { color: var(--muted); font-size: 0.72rem; }
+@keyframes drop { from { transform: translateY(-20px); opacity: 0; } to { transform: none; opacity: 1; } }
+.confirm { display: grid; gap: 8px; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chips button { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 5px 12px; font-size: 0.85rem; }
+.chips button[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); font-weight: 700; }
+.welcome-mark { font-family: var(--display); font-size: 2.2rem; line-height: 1.1; color: var(--accent); }
+
+/* ---------- Portal ---------- */
+.portal { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; box-shadow: var(--shadow); overflow: hidden; min-width: 0; }
+.p-top { display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; padding: 12px 18px; border-bottom: 1px solid var(--line); }
+.p-brand { font-weight: 700; }
+.p-brand small { color: var(--muted); font-weight: 500; margin-left: 4px; }
+.p-nav { display: flex; gap: 4px; flex: 1; }
+.p-nav button { border: 0; background: none; padding: 6px 12px; border-radius: 8px; font-weight: 600; }
+.p-nav button[aria-current="page"] { background: var(--accent-soft); color: var(--accent); }
+.p-who { display: flex; gap: 8px; align-items: center; font-size: 0.88rem; color: var(--muted); }
+.p-who select { border: 1px solid var(--line); background: var(--surface); border-radius: 8px; padding: 4px 8px; }
+.p-body { padding: 20px 18px 28px; display: grid; gap: 16px; background: var(--sunk); min-height: 600px; align-content: start; }
+.p-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: 12px; }
+.p-head h2 { font-size: 1.4rem; }
+.p-filters { display: flex; gap: 8px; flex-wrap: wrap; }
+.p-filters select { border: 1px solid var(--line); background: var(--surface); border-radius: 8px; padding: 7px 10px; }
+.table-wrap { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; }
+table { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
+th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--line); white-space: nowrap; vertical-align: middle; }
+th { font-size: 0.72rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); background: var(--sunk); }
+tbody tr:last-child td { border-bottom: 0; }
+tbody tr.fresh { background: color-mix(in srgb, var(--info-soft) 60%, transparent); }
+td .rowlink { border: 0; background: none; padding: 0; font-weight: 700; color: var(--fg); text-decoration: underline; text-decoration-color: var(--line); text-underline-offset: 3px; }
+.num { font-variant-numeric: tabular-nums; }
+.p-detail { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 16px; align-items: start; }
+.p-card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 16px; display: grid; gap: 10px; min-width: 0; }
+.p-card h3 { font-size: 1rem; }
+.kv { display: grid; grid-template-columns: 120px minmax(0, 1fr); gap: 6px 12px; margin: 0; font-size: 0.92rem; }
+.kv dt { color: var(--muted); }
+.kv dd { margin: 0; overflow-wrap: anywhere; }
+.told { padding: 10px 12px; border-radius: 8px; background: var(--accent-soft); font-size: 0.92rem; }
+.told.warn { background: var(--warn-soft); }
+.p-btn { border: 1px solid transparent; border-radius: 8px; padding: 8px 14px; font-weight: 600; background: var(--accent); color: var(--accent-fg); }
+.p-btn:disabled { opacity: .42; cursor: not-allowed; }
+.p-btn.sec { background: var(--surface); color: var(--fg); border-color: var(--line); }
+.p-btn.danger { background: var(--danger-soft); color: var(--danger); }
+.p-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.p-card textarea { width: 100%; min-height: 80px; border: 1px solid var(--line); background: var(--surface); border-radius: 8px; padding: 8px 10px; resize: vertical; }
+.p-card label { font-size: 0.82rem; font-weight: 600; color: var(--muted); display: grid; gap: 4px; }
+.attach { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-size: 0.88rem; }
+.attach label.filebtn { display: inline-block; border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; cursor: pointer; color: var(--fg); font-weight: 600; }
+.attach input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+.notice { background: var(--warn-soft); color: var(--warn); border-radius: 8px; padding: 10px 14px; font-size: 0.92rem; }
+.flash { background: var(--accent-soft); color: var(--accent); border-radius: 8px; padding: 10px 14px; font-size: 0.92rem; font-weight: 600; }
+.rule-form { display: flex; flex-wrap: wrap; gap: 8px; align-items: end; }
+.rule-form label { font-size: 0.78rem; font-weight: 600; color: var(--muted); display: grid; gap: 3px; }
+.rule-form input, .rule-form select { border: 1px solid var(--line); background: var(--surface); border-radius: 8px; padding: 6px 8px; width: 110px; }
+.rule-form select { width: 190px; }
+tr.stale td.verified { color: var(--warn); font-weight: 700; }
+
+/* ---------- Image viewer ---------- */
+.viewer { position: fixed; inset: 0; z-index: 50; background: rgb(0 0 0 / 70%); display: grid; place-items: center; padding: 24px; }
+.viewer figure { margin: 0; background: var(--surface); border-radius: 14px; padding: 12px; display: grid; gap: 10px; max-width: min(640px, 100%); }
+.viewer img { max-height: 70vh; width: 100%; object-fit: contain; border-radius: 8px; }
+.viewer figcaption { display: flex; justify-content: space-between; align-items: center; gap: 12px; font-weight: 600; }
+
+/* ---------- Narrow screens ---------- */
+@media (max-width: 1080px) {
+  .stage, .stage[data-view="both"] { grid-template-columns: minmax(0, 1fr); }
+  .stage[data-view="both"] .portal-wrap { display: none; }
+  .seg button[data-view="both"] { display: none; }
+  .p-detail { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 600px) {
+  .stage[data-view="app"], .stage[data-view="both"] { grid-template-columns: minmax(0, 1fr); }
+  .phone-wrap { position: static; }
+  .phone-wrap .pane-label { display: none; }
+  .device { width: auto; height: calc(100vh - 150px); min-height: 560px; max-height: none; padding: 0; background: none; border-radius: 0; box-shadow: none; }
+  .screen { border-radius: 18px; border: 1px solid var(--line); }
+  .statusbar { display: none; }
+  .notif { top: 8px; }
+  .guide { display: none; }
+  .kv { grid-template-columns: 1fr; gap: 0 0; }
+  .kv dd { margin-bottom: 6px; }
+}
+@media (prefers-reduced-motion: reduce) { .notif { animation: none; } }
+</style>
+
+<header class="top">
+  <div class="brand">
+    <h1>Lanka Ready</h1>
+    <p>Clickable prototype · tourist app and staff portal · demo data only</p>
+  </div>
+  <div class="controls">
+    <div class="seg" role="group" aria-label="What to show">
+      <button type="button" data-view="both" aria-pressed="true">Both</button>
+      <button type="button" data-view="app" aria-pressed="false">Tourist app</button>
+      <button type="button" data-view="portal" aria-pressed="false">Staff portal</button>
+    </div>
+    <button type="button" class="ghost" id="reset">Reset demo</button>
+  </div>
+</header>
+
+<aside class="guide" aria-label="Try this">
+  <strong>Try this</strong>
+  <ol>
+    <li>Sign up on the phone with any email</li>
+    <li>Ask for help with your ETA</li>
+    <li>In the portal, start review, then ask for info</li>
+    <li>Watch the phone get the alert, then reply</li>
+    <li>Mark it completed with the approval</li>
+  </ol>
+</aside>
+
+<main class="stage" id="stage" data-view="both">
+  <section class="phone-wrap" aria-label="Tourist app">
+    <p class="pane-label">Tourist app</p>
+    <div class="device">
+      <div class="screen">
+        <div class="statusbar" aria-hidden="true"><span id="clock">9:41</span><span class="notch"></span><span>5G ▮▮▮</span></div>
+        <div class="app" id="app"></div>
+        <div id="notif-slot"></div>
+      </div>
+    </div>
+  </section>
+  <section class="portal-wrap" aria-label="Staff portal">
+    <p class="pane-label">Staff portal</p>
+    <div class="portal" id="portal"></div>
+  </section>
+</main>
+<div id="viewer-slot"></div>
+
+<script>
+(function () {
+  'use strict';
+
+  // ------------------------------------------------------------------ rules (mirrors packages/core)
+  const DAY = 86400000;
+  const utc = (iso) => { const [y, m, d] = iso.split('-').map(Number); return Date.UTC(y, m - 1, d); };
+  const stayDays = (a, d) => Math.round((utc(d) - utc(a)) / DAY) + 1;
+  const cmp = (a, b) => utc(a) - utc(b);
+  const todayColombo = () => new Date(Date.now() + 330 * 60000).toISOString().slice(0, 10);
+  const ISO = /^\d{4}-\d{2}-\d{2}$/;
+
+  function assessVisa(nat, arrival, departure, rules) {
+    const r = rules.find((x) => x.code === nat);
+    if (!r) return { kind: 'unknown' };
+    const days = stayDays(arrival, departure);
+    if (days > r.maxStay) return { kind: 'exceeds', days, max: r.maxStay, fee: r.fee };
+    return r.fee === 0 ? { kind: 'free', days, max: r.maxStay } : { kind: 'paid', fee: r.fee, days, max: r.maxStay };
+  }
+  function assessLicence(l, departure) {
+    if (!l || !l.has) return { kind: 'none' };
+    if (l.expiry && cmp(l.expiry, departure) < 0) return { kind: 'expires', expiry: l.expiry };
+    return { kind: 'eligible', route: l.idp ? 'aa' : 'dmt' };
+  }
+  function validateTrip(a, d, today) {
+    if (cmp(d, a) < 0) return 'Your departure date is before your arrival date.';
+    if (cmp(a, today) < 0) return 'Your arrival date has already passed.';
+    return null;
+  }
+  const TRANSITIONS = {
+    submitted: { staff: ['in_review'], tourist: ['cancelled'] },
+    in_review: { staff: ['needs_info', 'completed', 'rejected'], tourist: [] },
+    needs_info: { staff: ['in_review'], tourist: ['in_review', 'cancelled'] },
+    completed: { staff: [], tourist: [] }, rejected: { staff: [], tourist: [] }, cancelled: { staff: [], tourist: [] },
+  };
+  const next = (s, role) => TRANSITIONS[s][role];
+  const isOpen = (s) => !['completed', 'rejected', 'cancelled'].includes(s);
+  const requiredFiles = (type, idp) => type === 'eta' ? ['passport'] : idp ? ['licence_front', 'licence_back', 'photo', 'idp'] : ['licence_front', 'licence_back', 'photo'];
+
+  // ------------------------------------------------------------------ words
+  const T = {
+    type: { eta: 'ETA application', permit: 'Driving permit' },
+    typeLong: { eta: 'ETA application', permit: 'Sri Lankan driving permit' },
+    tourStatus: { submitted: 'Sent', in_review: 'Being worked on', needs_info: 'We need something from you', completed: 'Done', rejected: 'Not possible', cancelled: 'Cancelled' },
+    staffStatus: { submitted: 'New', in_review: 'In review', needs_info: 'Waiting on tourist', completed: 'Completed', rejected: 'Rejected', cancelled: 'Cancelled' },
+    action: { in_review: 'Start review', needs_info: 'Ask tourist for info', completed: 'Mark completed', rejected: 'Reject' },
+    doc: { passport: 'Passport photo page', licence_front: 'Licence (front)', licence_back: 'Licence (back)', photo: 'Photo of you', idp: 'International Driving Permit', eta_approval: 'ETA approval', permit: 'Driving permit' },
+    tuk: 'Three-wheelers (tuk-tuks) need a separate permit. Ask us.',
+  };
+  const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const fmtDate = (iso) => { if (!iso || !ISO.test(iso)) return '—'; const [y, m, d] = iso.split('-').map(Number); return `${d} ${MONTHS[m - 1]} ${y}`; };
+  const fmtTime = (ms) => { const d = new Date(ms + 330 * 60000); const p = (n) => String(n).padStart(2, '0'); return `${d.getUTCDate()} ${MONTHS[d.getUTCMonth()]}, ${p(d.getUTCHours())}:${p(d.getUTCMinutes())}`; };
+  const ago = (ms) => { const m = Math.max(0, Math.round((Date.now() - ms) / 60000)); if (m < 60) return `${m} min`; const h = Math.round(m / 60); return h < 48 ? `${h} h` : `${Math.round(h / 24)} days`; };
+  const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+  let COUNTRIES = [];
+  try {
+    const dn = new Intl.DisplayNames(['en'], { type: 'region' });
+    const skip = new Set(['EU', 'EZ', 'UN', 'QO', 'XA', 'XB', 'XK', 'ZZ', 'AC', 'CP', 'CQ', 'DG', 'EA', 'IC', 'TA', 'UK', 'AN', 'BU', 'CS', 'DD', 'FX', 'NT', 'QU', 'SU', 'TP', 'YD', 'YU', 'ZR', 'XX']);
+    for (let a = 65; a < 91; a++) for (let b = 65; b < 91; b++) {
+      const c = String.fromCharCode(a, b);
+      if (skip.has(c)) continue;
+      let n; try { n = dn.of(c); } catch (e) { continue; }
+      if (n && n !== c) COUNTRIES.push([c, n]);
+    }
+    COUNTRIES.sort((x, y) => x[1].localeCompare(y[1]));
+  } catch (e) {
+    COUNTRIES = [['AU', 'Australia'], ['CN', 'China'], ['DE', 'Germany'], ['IN', 'India'], ['JP', 'Japan'], ['GB', 'United Kingdom'], ['US', 'United States']];
+  }
+  const countryName = (c) => (COUNTRIES.find((x) => x[0] === c) || [c, c || '—'])[1];
+  const countryOptions = (sel) => `<option value="">Choose a country</option>` + COUNTRIES.map(([c, n]) => `<option value="${c}"${c === sel ? ' selected' : ''}>${esc(n)}</option>`).join('');
+
+  // ------------------------------------------------------------------ sample images (SVG)
+  function svgUrl(svg) { return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg); }
+  function sampleDoc(kind, name) {
+    const nm = esc(name || 'TRAVELLER');
+    const bg = { passport: '#1f3b5c', licence_front: '#e7eef7', licence_back: '#e7eef7', photo: '#dfe7e1', idp: '#e9e2cf', eta_approval: '#ffffff', permit: '#fff8e6' }[kind] || '#eee';
+    let inner = '';
+    if (kind === 'passport') inner = `<rect x="20" y="20" width="360" height="200" rx="10" fill="#f4f1e6"/><rect x="40" y="50" width="90" height="115" rx="4" fill="#c9d3cc"/><circle cx="85" cy="95" r="22" fill="#8fa497"/><rect x="58" y="122" width="54" height="34" rx="16" fill="#8fa497"/><text x="150" y="62" font-family="sans-serif" font-size="13" fill="#555">PASSPORT</text><text x="150" y="90" font-family="sans-serif" font-size="17" font-weight="700" fill="#222">${nm}</text><rect x="150" y="104" width="180" height="8" fill="#d8d3c2"/><rect x="150" y="120" width="140" height="8" fill="#d8d3c2"/><rect x="150" y="136" width="160" height="8" fill="#d8d3c2"/><text x="40" y="200" font-family="monospace" font-size="12" fill="#666">P&lt;&lt;${nm.replace(/ /g, '&lt;')}&lt;&lt;&lt;&lt;&lt;</text>`;
+    else if (kind === 'licence_front' || kind === 'licence_back') inner = `<rect x="30" y="30" width="340" height="180" rx="14" fill="#fff" stroke="#9fb4d1"/><text x="50" y="62" font-family="sans-serif" font-size="14" font-weight="700" fill="#2b4a7a">DRIVING LICENCE ${kind === 'licence_back' ? '· BACK' : ''}</text>${kind === 'licence_front' ? `<rect x="50" y="80" width="80" height="100" rx="4" fill="#c9d3cc"/><text x="150" y="105" font-family="sans-serif" font-size="15" font-weight="700" fill="#222">${nm}</text>` : '<rect x="50" y="85" width="300" height="18" fill="#e4ebf4"/><rect x="50" y="113" width="300" height="18" fill="#e4ebf4"/><rect x="50" y="141" width="300" height="18" fill="#e4ebf4"/>'}<rect x="150" y="125" width="170" height="8" fill="#dde5ef"/><rect x="150" y="142" width="130" height="8" fill="#dde5ef"/>`;
+    else if (kind === 'photo') inner = `<circle cx="200" cy="100" r="46" fill="#8fa497"/><rect x="120" y="150" width="160" height="90" rx="60" fill="#8fa497"/>`;
+    else if (kind === 'idp') inner = `<rect x="80" y="20" width="240" height="200" rx="6" fill="#d9cfb2" stroke="#a89a73"/><text x="200" y="80" text-anchor="middle" font-family="serif" font-size="16" fill="#5b4c26">INTERNATIONAL</text><text x="200" y="104" text-anchor="middle" font-family="serif" font-size="16" fill="#5b4c26">DRIVING PERMIT</text><circle cx="200" cy="160" r="26" fill="none" stroke="#5b4c26" stroke-width="2"/>`;
+    else inner = `<rect x="30" y="20" width="340" height="200" rx="6" fill="#fff" stroke="#c9d3cc"/><text x="50" y="56" font-family="sans-serif" font-size="14" font-weight="700" fill="#165a3c">${kind === 'eta_approval' ? 'ELECTRONIC TRAVEL AUTHORISATION' : 'SRI LANKA DRIVING PERMIT'}</text><text x="50" y="84" font-family="sans-serif" font-size="15" fill="#222">${nm}</text><rect x="50" y="100" width="200" height="8" fill="#e3ebe5"/><rect x="50" y="116" width="160" height="8" fill="#e3ebe5"/><g transform="rotate(-12 290 160)"><rect x="220" y="135" width="140" height="44" rx="6" fill="none" stroke="#165a3c" stroke-width="3"/><text x="290" y="164" text-anchor="middle" font-family="sans-serif" font-size="18" font-weight="700" fill="#165a3c">${kind === 'eta_approval' ? 'APPROVED' : 'ISSUED'}</text></g><text x="50" y="205" font-family="sans-serif" font-size="10" fill="#999">SAMPLE · NOT A REAL DOCUMENT</text>`;
+    return svgUrl(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 240"><rect width="400" height="240" fill="${bg}"/>${inner}</svg>`);
+  }
+
+  function shrinkImage(file) {
+    return new Promise((resolve, reject) => {
+      const fr = new FileReader();
+      fr.onerror = reject;
+      fr.onload = () => {
+        const img = new Image();
+        img.onerror = () => resolve(fr.result);
+        img.onload = () => {
+          const scale = Math.min(1, 800 / Math.max(img.width, img.height));
+          const c = document.createElement('canvas');
+          c.width = Math.round(img.width * scale); c.height = Math.round(img.height * scale);
+          c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+          resolve(c.toDataURL('image/jpeg', 0.72));
+        };
+        img.src = fr.result;
+      };
+      fr.readAsDataURL(file);
+    });
+  }
+
+  // ------------------------------------------------------------------ demo data
+  const SRC = 'https://www.adaderana.lk/news.php?nid=122919';
+  function seed() {
+    const now = Date.now(), h = 3600000;
+    const rules = ['AU', 'AT', 'BH', 'BY', 'BE', 'CA', 'CN', 'CZ', 'DK', 'IN', 'ID', 'JP', 'MY', 'RU', 'TH'].map((code) => ({ code, fee: 0, maxStay: 30, source: SRC, verified: '2026-11-05' }));
+    const tourists = [
+      { id: 't-anna', email: 'anna@example.test', name: 'Anna Demo', phone: '+61400000001', nat: 'AU', trip: { arrival: '2027-01-12', departure: '2027-02-02' }, licence: { has: true, issuedBy: 'AU', number: 'DEMO-123456', expiry: '2030-06-30', idp: true } },
+      { id: 't-ben', email: 'ben@example.test', name: 'Ben Walker', phone: '+447700900123', nat: 'GB', trip: { arrival: '2027-02-03', departure: '2027-02-17' }, licence: { has: true, issuedBy: 'GB', number: 'WALKE801013B99XY', expiry: '2031-04-30', idp: false } },
+      { id: 't-chen', email: 'chen@example.test', name: 'Chen Li', phone: '+8613800000001', nat: 'CN', trip: { arrival: '2027-03-01', departure: '2027-04-14' }, licence: { has: false } },
+    ];
+    const ev = (to, from, at, note, by) => ({ to, from, at, note: note || null, by: by || 'staff' });
+    const requests = [
+      { id: 'r-anna-permit', touristId: 't-anna', type: 'permit', status: 'completed', details: {}, createdAt: now - 144 * h,
+        docs: [{ kind: 'licence_front', url: sampleDoc('licence_front', 'Anna Demo') }, { kind: 'licence_back', url: sampleDoc('licence_back') }, { kind: 'photo', url: sampleDoc('photo') }, { kind: 'idp', url: sampleDoc('idp') }, { kind: 'permit', url: sampleDoc('permit', 'Anna Demo'), by: 'staff' }],
+        events: [ev('submitted', null, now - 144 * h, null, 'tourist'), ev('in_review', 'submitted', now - 120 * h), ev('completed', 'in_review', now - 96 * h, 'Your AA Ceylon recognition permit is ready. Collect it at the AA Ceylon desk in the airport arrivals hall.')] },
+      { id: 'r-ben-permit', touristId: 't-ben', type: 'permit', status: 'needs_info', details: {}, createdAt: now - 48 * h,
+        docs: [{ kind: 'licence_front', url: sampleDoc('licence_front', 'Ben Walker') }, { kind: 'photo', url: sampleDoc('photo') }],
+        events: [ev('submitted', null, now - 48 * h, null, 'tourist'), ev('in_review', 'submitted', now - 44 * h), ev('needs_info', 'in_review', now - 43 * h, 'Please add a photo of the back of your licence.')] },
+      { id: 'r-chen-eta', touristId: 't-chen', type: 'eta', status: 'in_review', details: { passportNumber: 'E12345678', passportExpiry: '2032-01-15' }, createdAt: now - 24 * h,
+        docs: [{ kind: 'passport', url: sampleDoc('passport', 'Chen Li') }],
+        events: [ev('submitted', null, now - 24 * h, null, 'tourist'), ev('in_review', 'submitted', now - 20 * h, 'Your stay is 45 days. We will apply for the ETA and advise on extending it.')] },
+      { id: 'r-ben-eta', touristId: 't-ben', type: 'eta', status: 'submitted', details: { passportNumber: '533380001', passportExpiry: '2030-08-01' }, createdAt: now - 3 * h,
+        docs: [{ kind: 'passport', url: sampleDoc('passport', 'Ben Walker') }],
+        events: [ev('submitted', null, now - 3 * h, null, 'tourist')] },
+    ];
+    return {
+      v: 1, rules, tourists, requests,
+      phone: { me: null, screen: 'welcome', stack: [], draft: null, email: '', reqId: null, newType: null, files: {}, unread: false, replyKind: null, replyFile: null, confirmCancel: false, error: null },
+      portal: { screen: 'inbox', reqId: null, filter: 'open', type: '', role: 'agent', flash: null, editRule: null, attach: null },
+      view: 'both',
+    };
+  }
+
+  const KEY = 'lanka-ready-demo-v1';
+  let S;
+  try { S = JSON.parse(localStorage.getItem(KEY)); } catch (e) { S = null; }
+  if (!S || S.v !== 1) S = seed();
+  let saveTimer = null;
+  function save() {
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(() => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { /* storage full or blocked: demo still works in memory */ } }, 150);
+  }
+
+  const P = () => S.phone;
+  const me = () => S.tourists.find((t) => t.id === P().me) || null;
+  const tourist = (id) => S.tourists.find((t) => t.id === id);
+  const req = (id) => S.requests.find((r) => r.id === id);
+  const openReq = (tid, type) => S.requests.find((r) => r.touristId === tid && r.type === type && isOpen(r.status));
+  const uid = () => Math.random().toString(36).slice(2, 10);
+
+  // ------------------------------------------------------------------ status changes (one place, like change_request_status)
+  function changeStatus(r, to, role, note) {
+    if (!next(r.status, role).includes(to)) return false;
+    r.events.push({ from: r.status, to, at: Date.now(), note: note || null, by: role });
+    r.status = to;
+    if (role === 'staff') pushToPhone(r, to, note);
+    return true;
+  }
+  let notif = null, notifTimer = null;
+  function pushToPhone(r, to, note) {
+    const label = T.type[r.type];
+    const msg = {
+      in_review: [`We're working on your ${label}`, note || "We'll let you know when it's done."],
+      needs_info: [`Action needed: ${label}`, note || 'Open the app to see what we need.'],
+      completed: [r.type === 'eta' ? 'Your ETA is approved' : 'Your driving permit is ready', note || 'Open the app to see it.'],
+      rejected: [`Update on your ${label}`, note || 'Open the app for details.'],
+    }[to];
+    if (!msg) return;
+    if (P().me === r.touristId) {
+      P().unread = true;
+      notif = { title: msg[0], body: msg[1], reqId: r.id };
+      clearTimeout(notifTimer);
+      notifTimer = setTimeout(() => { notif = null; renderNotif(); }, 7000);
+    }
+  }
+
+  // ------------------------------------------------------------------ phone
+  const ICON = {
+    trip: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11"/><path d="m3 6 1.5 1.5L7 5M3 12l1.5 1.5L7 11M3 18l1.5 1.5L7 17"/></svg>',
+    inbox: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.5 5h13L22 12v6a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-6z"/></svg>',
+  };
+
+  function go(screen, opts) {
+    const p = P();
+    if (opts && opts.replace) p.stack = []; else p.stack.push(p.screen === 'request' ? `request:${p.reqId}` : p.screen === 'new' ? `new:${p.newType}` : p.screen);
+    p.screen = screen; p.error = null; p.confirmCancel = false;
+    renderAll();
+    const body = document.querySelector('#app .app-body'); if (body) body.scrollTop = 0;
+  }
+  function back() {
+    const p = P();
+    const prev = p.stack.pop() || (p.me ? 'home' : 'welcome');
+    const [scr, arg] = prev.split(':');
+    p.screen = scr; if (scr === 'request') p.reqId = arg; if (scr === 'new') p.newType = arg;
+    p.error = null; p.confirmCancel = false;
+    renderAll();
+  }
+
+  function head(title, opts = {}) {
+    return `<div class="app-head">${opts.back ? '<button type="button" class="back" data-a="back">‹ Back</button>' : ''}<span class="title">${esc(title || '')}</span>${opts.right || ''}</div>`;
+  }
+  function tabbar(active) {
+    return `<nav class="tabbar" aria-label="App sections">
+      <button type="button" data-a="tab-home" ${active === 'home' ? 'aria-current="page"' : ''}>${ICON.trip}My trip</button>
+      <button type="button" data-a="tab-requests" ${active === 'requests' ? 'aria-current="page"' : ''}>${P().unread ? '<span class="dot" aria-label="New update"></span>' : ''}${ICON.inbox}Requests</button>
+    </nav>`;
+  }
+
+  function phoneScreen() {
+    const p = P();
+    switch (p.screen) {
+      case 'welcome': return `${head('')}<div class="app-body">
+        <p class="welcome-mark">Ayubowan.</p>
+        <h2 class="a-title">Get ready for Sri Lanka</h2>
+        <p class="muted">Check your visa and driving rules, and let our team handle the paperwork. Sign in with your email and we'll send you a 6-digit code.</p>
+        <div class="field"><label class="a-label" for="ph-email">Email</label><input id="ph-email" type="email" autocomplete="email" placeholder="you@example.com" value="${esc(p.email)}"></div>
+        <p class="err" id="ph-email-err" hidden></p>
+        <button type="button" class="btn" data-a="send-code" id="ph-send">Send code</button>
+        <p class="muted" style="font-size:.85rem">Demo: try <b>anna@example.test</b>, <b>ben@example.test</b> or <b>chen@example.test</b> to see existing tourists, or any other email to sign up as someone new.</p>
+      </div>`;
+      case 'code': return `${head('', { back: true })}<div class="app-body">
+        <h2 class="a-title">Check your email</h2>
+        <p class="muted">We sent a 6-digit code to ${esc(p.email)}.</p>
+        <div class="field"><label class="a-label" for="ph-code">6-digit code</label><input id="ph-code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="123456"></div>
+        <p class="hint muted" style="font-size:.85rem">Demo: any 6 digits work.</p>
+        <button type="button" class="btn" data-a="verify" id="ph-verify" disabled>Sign in</button>
+      </div>`;
+      case 'about': { const d = p.draft; return `${head('Step 1 of 3', { back: true })}<div class="app-body">
+        <h2 class="a-title">About you</h2>
+        <p class="muted">We use this to check your visa and to contact you about your requests.</p>
+        <div class="field"><label class="a-label" for="ph-name">Full name (as on passport)</label><input id="ph-name" autocomplete="name" value="${esc(d.name)}"></div>
+        <div class="field"><label class="a-label" for="ph-phone">Mobile number</label><input id="ph-phone" type="tel" autocomplete="tel" placeholder="+44 7700 900123" value="${esc(d.phoneRaw)}"><span class="hint" id="ph-phone-msg">Include your country code, for example +44 7700 900123.</span></div>
+        <div class="field"><label class="a-label" for="ph-nat">Nationality (passport)</label><select id="ph-nat">${countryOptions(d.nat)}</select><span class="hint">Visa rules depend on your passport, not where you fly from.</span></div>
+        <button type="button" class="btn" data-a="about-next" id="ph-next">Next</button>
+      </div>`; }
+      case 'trip': { const d = p.draft; return `${head('Step 2 of 3', { back: true })}<div class="app-body">
+        <h2 class="a-title">Your trip</h2>
+        <p class="muted">When will you be in Sri Lanka?</p>
+        <div class="field"><label class="a-label" for="ph-arr">Arrival date</label><input id="ph-arr" type="date" value="${esc(d.arrival)}"></div>
+        <div class="field"><label class="a-label" for="ph-dep">Departure date</label><input id="ph-dep" type="date" value="${esc(d.departure)}"></div>
+        <p id="ph-trip-msg" aria-live="polite"></p>
+        <button type="button" class="btn" data-a="trip-next" id="ph-next">Next</button>
+      </div>`; }
+      case 'licence': { const d = p.draft; return `${head('Step 3 of 3', { back: true })}<div class="app-body">
+        <h2 class="a-title">Driving</h2>
+        <p class="muted">Tell us about your licence so we can check whether you can drive in Sri Lanka.</p>
+        <div class="field"><span class="a-label">Do you have a driving licence?</span><div class="yesno"><button type="button" data-a="lic-has" data-v="1" aria-pressed="${d.has === true}">Yes</button><button type="button" data-a="lic-has" data-v="0" aria-pressed="${d.has === false}">No</button></div></div>
+        ${d.has ? `
+          <div class="field"><label class="a-label" for="ph-issued">Licence issued by</label><select id="ph-issued">${countryOptions(d.issuedBy || d.nat)}</select></div>
+          <div class="field"><label class="a-label" for="ph-licno">Licence number (optional)</label><input id="ph-licno" value="${esc(d.number)}"></div>
+          <div class="field"><label class="a-label" for="ph-exp">Licence expiry date</label><input id="ph-exp" type="date" value="${esc(d.expiry)}"></div>
+          <div class="field"><span class="a-label">Do you have an International Driving Permit (IDP)?</span><div class="yesno"><button type="button" data-a="lic-idp" data-v="1" aria-pressed="${d.idp === true}">Yes</button><button type="button" data-a="lic-idp" data-v="0" aria-pressed="${d.idp === false}">No</button></div><span class="hint">An IDP is issued in the country that issued your licence.</span></div>` : ''}
+        <button type="button" class="btn" data-a="finish" id="ph-next">Finish</button>
+      </div>`; }
+      case 'home': return homeScreen();
+      case 'new': return newRequestScreen();
+      case 'requests': return requestsScreen();
+      case 'request': return requestScreen();
+    }
+    return '';
+  }
+
+  function etaCard(v, open) {
+    let tone = 'good', title, body;
+    if (v.kind === 'free') { title = 'Free ETA. Apply before you fly.'; body = `Your ${v.days}-day stay fits inside the ${v.max}-day free ETA. You still need to apply before you travel.`; }
+    else if (v.kind === 'paid') { tone = ''; title = `ETA required: US$${v.fee}`; body = 'You need an Electronic Travel Authorisation (ETA) before you fly. We can apply for you.'; }
+    else if (v.kind === 'exceeds') { tone = 'warn'; title = 'Your stay is longer than the ETA allows'; body = `Your ${v.days}-day trip is longer than the ${v.max} days an ETA covers. Our team can advise on an extension.${v.fee ? ` The ETA fee is US$${v.fee}.` : ''}`; }
+    else { tone = 'warn'; title = 'Our team will check your visa requirements.'; body = 'We could not find the rules for your nationality yet. Ask us and we will confirm what you need.'; }
+    return `<article class="card ${tone}"><span class="a-label">Visa</span><h3>${title}</h3><p>${body}</p>
+      ${open ? `<button type="button" class="btn soft" data-a="open-req" data-id="${open.id}">View request · ${esc(T.tourStatus[open.status])}</button>` : `<button type="button" class="btn" data-a="new-req" data-type="eta">Get help applying</button>`}</article>`;
+  }
+  function driveCard(l, open) {
+    let tone = 'good', title, body, can = true;
+    if (l.kind === 'none') { tone = ''; can = false; title = "You can't drive yourself in Sri Lanka"; body = 'Without a driving licence you can still get around with a car and driver.'; }
+    else if (l.kind === 'expires') { tone = 'warn'; can = false; title = 'Your licence expires during your trip'; body = `It expires on ${fmtDate(l.expiry)}. Renew it before you travel if you want to drive in Sri Lanka.`; }
+    else { title = 'You can drive with a Sri Lankan permit'; body = l.route === 'aa' ? 'You have an International Driving Permit, so you need an AA Ceylon recognition permit. We can arrange it.' : 'Without an International Driving Permit you need a temporary permit from the Department of Motor Traffic. We can arrange it.'; }
+    return `<article class="card ${tone}"><span class="a-label">Driving</span><h3>${title}</h3><p>${body}</p><p>${T.tuk}</p>
+      ${open ? `<button type="button" class="btn soft" data-a="open-req" data-id="${open.id}">View request · ${esc(T.tourStatus[open.status])}</button>` : can ? `<button type="button" class="btn" data-a="new-req" data-type="permit">Get my permit</button>` : ''}</article>`;
+  }
+
+  function homeScreen() {
+    const t = me();
+    const v = assessVisa(t.nat, t.trip.arrival, t.trip.departure, S.rules);
+    const l = assessLicence(t.licence, t.trip.departure);
+    return `${head('My trip', { right: '<button type="button" class="link" data-a="sign-out">Sign out</button>' })}<div class="app-body">
+      <h2 class="a-title">Hi ${esc(t.name.split(' ')[0])}, here's what you need</h2>
+      <p class="muted">${fmtDate(t.trip.arrival)} to ${fmtDate(t.trip.departure)} · ${stayDays(t.trip.arrival, t.trip.departure)} days</p>
+      ${etaCard(v, openReq(t.id, 'eta'))}
+      ${driveCard(l, openReq(t.id, 'permit'))}
+    </div>${tabbar('home')}`;
+  }
+
+  function slot(kind) {
+    const url = P().files[kind];
+    return `<div class="slot"><div class="slot-head"><span>${T.doc[kind]}</span>${url ? '<span class="ok">Added</span>' : ''}</div>
+      ${url ? `<img src="${url}" alt="${T.doc[kind]}">` : ''}
+      <div class="slot-btns"><label>Choose photo<input type="file" accept="image/*" data-file="${kind}"></label><button type="button" data-a="sample" data-kind="${kind}">Use sample</button></div></div>`;
+  }
+
+  function newRequestScreen() {
+    const p = P(), t = me(), type = p.newType;
+    const kinds = requiredFiles(type, t.licence && t.licence.idp);
+    return `${head(T.typeLong[type], { back: true })}<div class="app-body">
+      <h2 class="a-title">${T.typeLong[type]}</h2>
+      <p class="muted">${type === 'eta' ? 'We will apply for your ETA on eta.gov.lk and send you the approval.' : 'We will arrange your Sri Lankan driving permit and tell you where to collect it.'}</p>
+      ${type === 'eta' ? `
+        <div class="field"><label class="a-label" for="ph-pp">Passport number</label><input id="ph-pp" autocapitalize="characters" value="${esc(p.draftReq?.pp || '')}"></div>
+        <div class="field"><label class="a-label" for="ph-ppexp">Passport expiry date</label><input id="ph-ppexp" type="date" value="${esc(p.draftReq?.ppexp || '')}"></div>` : ''}
+      ${kinds.map(slot).join('')}
+      ${p.error ? `<p class="err" role="alert">${esc(p.error)}</p>` : ''}
+      <button type="button" class="btn" data-a="submit-req" id="ph-submit">Send request</button>
+    </div>`;
+  }
+
+  function requestsScreen() {
+    const t = me();
+    const rows = S.requests.filter((r) => r.touristId === t.id).sort((a, b) => b.createdAt - a.createdAt);
+    return `${head('Requests')}<div class="app-body">
+      ${rows.length ? rows.map((r) => `<button type="button" class="list-row" data-a="open-req" data-id="${r.id}"><span class="grow"><b>${T.typeLong[r.type]}</b><small>Sent ${fmtTime(r.createdAt)}</small></span><span class="pill ${r.status}">${T.tourStatus[r.status]}</span></button>`).join('')
+        : '<p class="muted">Requests you send us will appear here. Start from the My trip tab.</p>'}
+    </div>${tabbar('requests')}`;
+  }
+
+  function requestScreen() {
+    const p = P(), r = req(p.reqId), t = me();
+    if (!r) return `${head('Request', { back: true })}<div class="app-body"><p class="err">This request no longer exists.</p></div>`;
+    const kinds = requiredFiles(r.type, true);
+    const kind = p.replyKind && kinds.includes(p.replyKind) ? p.replyKind : kinds[0];
+    const canCancel = next(r.status, 'tourist').includes('cancelled');
+    return `${head('Request', { back: true })}<div class="app-body">
+      <div style="display:grid;gap:4px"><h2 class="a-title">${T.typeLong[r.type]}</h2><p class="muted">Sent ${fmtTime(r.createdAt)}</p></div>
+      <span class="pill ${r.status}">${T.tourStatus[r.status]}</span>
+      ${r.status === 'needs_info' ? `<section class="card warn"><span class="a-label">Reply to our team</span>
+        <div class="field"><label class="a-label" for="ph-reply">Message to our team</label><textarea id="ph-reply"></textarea></div>
+        ${kinds.length > 1 ? `<div class="chips" role="group" aria-label="Which document?">${kinds.map((k) => `<button type="button" data-a="reply-kind" data-kind="${k}" aria-pressed="${k === kind}">${T.doc[k]}</button>`).join('')}</div>` : ''}
+        <div class="slot"><div class="slot-head"><span>${T.doc[kind]}</span>${p.replyFile ? '<span class="ok">Added</span>' : ''}</div>${p.replyFile ? `<img src="${p.replyFile}" alt="">` : ''}
+          <div class="slot-btns"><label>Choose photo<input type="file" accept="image/*" data-file="reply"></label><button type="button" data-a="sample-reply" data-kind="${kind}">Use sample</button></div></div>
+        ${p.error ? `<p class="err" role="alert">${esc(p.error)}</p>` : ''}
+        <button type="button" class="btn" data-a="send-reply" data-kind="${kind}">Send to team</button></section>` : ''}
+      <section style="display:grid;gap:10px"><span class="a-label">Progress</span>
+        <ol class="timeline">${r.events.map((e) => `<li><b>${T.tourStatus[e.to]}</b><span class="when">${fmtTime(e.at)}</span>${e.note ? `<span class="note">${esc(e.note)}</span>` : ''}</li>`).join('')}</ol></section>
+      ${r.docs.length ? `<section style="display:grid;gap:10px"><span class="a-label">Documents</span><div class="thumbs">${r.docs.map((d, i) => `<button type="button" class="thumb" data-a="view-doc" data-id="${r.id}" data-i="${i}"><img src="${d.url}" alt=""><span>${T.doc[d.kind]}</span></button>`).join('')}</div></section>` : ''}
+      ${canCancel ? (p.confirmCancel ? `<div class="confirm"><p>Cancel this request? You can send a new one later.</p><button type="button" class="btn danger" data-a="cancel-yes">Yes, cancel it</button><button type="button" class="btn soft" data-a="cancel-no">Keep it</button></div>` : '<button type="button" class="btn danger" data-a="cancel">Cancel request</button>') : ''}
+    </div>${tabbar('requests')}`;
+  }
+
+  // live validation without re-rendering (keeps focus while typing)
+  function validatePhone() {
+    const p = P();
+    const $ = (id) => document.getElementById(id);
+    if (p.screen === 'welcome') {
+      const ok = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(($('ph-email')?.value || '').trim());
+      if ($('ph-send')) $('ph-send').disabled = !ok;
+    } else if (p.screen === 'code') {
+      if ($('ph-verify')) $('ph-verify').disabled = (($('ph-code')?.value || '').replace(/\D/g, '').length !== 6);
+    } else if (p.screen === 'about') {
+      const d = p.draft;
+      d.name = $('ph-name').value; d.phoneRaw = $('ph-phone').value; d.nat = $('ph-nat').value;
+      const phone = d.phoneRaw.replace(/[\s\-()]/g, '');
+      const phoneOk = /^\+[1-9][0-9]{6,14}$/.test(phone);
+      const msg = $('ph-phone-msg');
+      if (d.phoneRaw && !phoneOk) { msg.textContent = 'Start with + and your country code, for example +44 7700 900123.'; msg.className = 'err'; }
+      else { msg.textContent = 'Include your country code, for example +44 7700 900123.'; msg.className = 'hint'; }
+      $('ph-next').disabled = !(d.name.trim() && phoneOk && d.nat);
+    } else if (p.screen === 'trip') {
+      const d = p.draft;
+      d.arrival = $('ph-arr').value; d.departure = $('ph-dep').value;
+      const msg = $('ph-trip-msg');
+      let ok = false;
+      if (ISO.test(d.arrival) && ISO.test(d.departure)) {
+        const e = validateTrip(d.arrival, d.departure, todayColombo());
+        if (e) { msg.textContent = e; msg.className = 'err'; }
+        else { const n = stayDays(d.arrival, d.departure); msg.textContent = `${n} ${n === 1 ? 'day' : 'days'} in Sri Lanka`; msg.className = ''; ok = true; }
+      } else { msg.textContent = ''; }
+      $('ph-next').disabled = !ok;
+    } else if (p.screen === 'licence') {
+      const d = p.draft;
+      if (d.has) { d.issuedBy = $('ph-issued').value; d.number = $('ph-licno').value; d.expiry = $('ph-exp').value; }
+      $('ph-next').disabled = !(d.has === false || (d.has === true && d.issuedBy && ISO.test(d.expiry || '') && typeof d.idp === 'boolean'));
+    } else if (p.screen === 'new') {
+      const t = me();
+      p.draftReq = p.draftReq || {};
+      if ($('ph-pp')) { p.draftReq.pp = $('ph-pp').value; p.draftReq.ppexp = $('ph-ppexp').value; }
+      const kinds = requiredFiles(p.newType, t.licence && t.licence.idp);
+      const filesOk = kinds.every((k) => p.files[k]);
+      const detailsOk = p.newType !== 'eta' || (p.draftReq.pp?.trim() && ISO.test(p.draftReq.ppexp || ''));
+      $('ph-submit').disabled = !(filesOk && detailsOk);
+    }
+  }
+
+  // ------------------------------------------------------------------ portal
+  const NOTE_REQUIRED = ['needs_info', 'rejected'];
+  function portalShell(inner) {
+    const pt = S.portal;
+    const nav = (id, label) => `<button type="button" data-a="p-nav" data-to="${id}" ${(pt.screen === id || (id === 'inbox' && pt.screen === 'detail')) ? 'aria-current="page"' : ''}>${label}</button>`;
+    return `<div class="p-top"><span class="p-brand">Lanka Ready<small>Operations</small></span>
+      <nav class="p-nav" aria-label="Portal">${nav('inbox', 'Inbox')}${nav('rules', 'Visa rules')}</nav>
+      <label class="p-who">Signed in as <select id="p-role"><option value="agent"${pt.role === 'agent' ? ' selected' : ''}>Agent</option><option value="admin"${pt.role === 'admin' ? ' selected' : ''}>Admin</option></select></label></div>
+      <div class="p-body">${pt.flash ? `<p class="flash" role="status">${esc(pt.flash)}</p>` : ''}${inner}</div>`;
+  }
+
+  function inbox() {
+    const pt = S.portal;
+    let rows = S.requests.filter((r) => pt.filter === 'all' || isOpen(r.status));
+    if (pt.type) rows = rows.filter((r) => r.type === pt.type);
+    rows.sort((a, b) => a.createdAt - b.createdAt);
+    return `<div class="p-head"><div><h2>Inbox</h2><p class="muted">${rows.length} ${rows.length === 1 ? 'request' : 'requests'} · oldest first</p></div>
+      <div class="p-filters"><label class="sr" for="p-type" hidden>Type</label><select id="p-type" aria-label="Type"><option value="">All types</option><option value="eta"${pt.type === 'eta' ? ' selected' : ''}>ETA application</option><option value="permit"${pt.type === 'permit' ? ' selected' : ''}>Driving permit</option></select>
+      <select id="p-filter" aria-label="Status"><option value="open"${pt.filter === 'open' ? ' selected' : ''}>Open</option><option value="all"${pt.filter === 'all' ? ' selected' : ''}>Everything</option></select></div></div>
+      <div class="table-wrap">${rows.length ? `<table><thead><tr><th>Tourist</th><th>Request</th><th>Status</th><th>Nationality</th><th>Arrives</th><th>Waiting</th></tr></thead><tbody>
+        ${rows.map((r) => { const t = tourist(r.touristId); return `<tr class="${r.status === 'submitted' ? 'fresh' : ''}"><td><button type="button" class="rowlink" data-a="p-open" data-id="${r.id}">${esc(t.name)}</button></td><td>${T.type[r.type]}</td><td><span class="pill ${r.status}">${T.staffStatus[r.status]}</span></td><td>${esc(countryName(t.nat))}</td><td class="num">${fmtDate(t.trip.arrival)}</td><td class="num">${ago(r.createdAt)}</td></tr>`; }).join('')}
+      </tbody></table>` : '<p class="muted" style="padding:28px;text-align:center">Nothing waiting. New requests from the app appear here.</p>'}</div>`;
+  }
+
+  function toldText(r, t) {
+    if (r.type === 'eta') {
+      const v = assessVisa(t.nat, t.trip.arrival, t.trip.departure, S.rules);
+      return {
+        free: [`Free ETA · ${v.days}-day stay within ${v.max} days`, false],
+        paid: [`Paid ETA · to collect: US$${v.fee}`, false],
+        exceeds: [`Stay of ${v.days} days is longer than the ${v.max}-day ETA · advise on extension`, true],
+        unknown: ['Nationality not in the visa rules · check eta.gov.lk and add it under Visa rules', true],
+      }[v.kind];
+    }
+    const l = assessLicence(t.licence, t.trip.departure);
+    if (l.kind === 'none') return ['No licence · car with driver only', true];
+    if (l.kind === 'expires') return [`Licence expires ${fmtDate(l.expiry)}, before departure`, true];
+    return [l.route === 'aa' ? 'Has IDP · AA Ceylon recognition permit' : 'No IDP · DMT temporary permit', false];
+  }
+
+  function detail() {
+    const pt = S.portal, r = req(pt.reqId);
+    if (!r) return '<p>Request not found.</p>';
+    const t = tourist(r.touristId), told = toldText(r, t), moves = next(r.status, 'staff');
+    const approvalKind = r.type === 'eta' ? 'eta_approval' : 'permit';
+    return `<p><button type="button" class="p-btn sec" data-a="p-nav" data-to="inbox">‹ Inbox</button></p>
+      <div class="p-head"><div><h2>${T.type[r.type]}</h2><p class="muted">${esc(t.name)} · sent ${fmtTime(r.createdAt)}</p></div><span class="pill ${r.status}">${T.staffStatus[r.status]}</span></div>
+      <div class="p-detail">
+        <div style="display:grid;gap:16px;min-width:0">
+          <section class="p-card"><h3>Tourist</h3><dl class="kv">
+            <dt>Name</dt><dd>${esc(t.name)}</dd><dt>Email</dt><dd>${esc(t.email)}</dd><dt>Phone</dt><dd class="num">${esc(t.phone)}</dd>
+            <dt>Nationality</dt><dd>${esc(countryName(t.nat))}</dd>
+            <dt>Trip</dt><dd>${fmtDate(t.trip.arrival)} → ${fmtDate(t.trip.departure)} · ${stayDays(t.trip.arrival, t.trip.departure)} days</dd>
+            ${r.type === 'eta' ? `<dt>Passport no.</dt><dd class="num">${esc(r.details.passportNumber)}</dd><dt>Passport expiry</dt><dd>${fmtDate(r.details.passportExpiry)}</dd>`
+              : `<dt>Licence</dt><dd>${t.licence.has ? `${esc(countryName(t.licence.issuedBy))} · ${esc(t.licence.number || 'no number given')} · expires ${fmtDate(t.licence.expiry)}` : 'None'}</dd><dt>IDP</dt><dd>${t.licence.idp ? 'Yes' : 'No'}</dd>`}
+          </dl><p class="told ${told[1] ? 'warn' : ''}"><b>What the app told them:</b> ${told[0]}</p></section>
+          <section class="p-card"><h3>Documents</h3>${r.docs.length ? `<div class="thumbs">${r.docs.map((d, i) => `<button type="button" class="thumb" data-a="view-doc" data-id="${r.id}" data-i="${i}"><img src="${d.url}" alt=""><span>${T.doc[d.kind]}</span></button>`).join('')}</div>` : '<p class="muted">No documents.</p>'}</section>
+        </div>
+        <div style="display:grid;gap:16px;min-width:0">
+          <section class="p-card"><h3>Next step</h3>${moves.length ? `
+            <label for="p-note">Note to the tourist<textarea id="p-note" placeholder="Shown to the tourist in the app"></textarea></label>
+            ${moves.includes('completed') ? `<div class="attach"><span>${r.type === 'eta' ? 'ETA approval' : 'Permit'}:</span>${pt.attach ? '<b>attached</b>' : ''}<label class="filebtn">Choose file<input type="file" accept="image/*" data-file="approval"></label><button type="button" class="p-btn sec" data-a="p-sample-attach" data-kind="${approvalKind}">Attach sample</button></div>` : ''}
+            <div class="p-actions">${moves.map((m) => `<button type="button" class="p-btn ${m === 'rejected' ? 'danger' : m === 'needs_info' ? 'sec' : ''}" data-a="p-move" data-to="${m}" ${NOTE_REQUIRED.includes(m) ? 'data-needs-note="1" disabled' : ''}>${T.action[m]}</button>`).join('')}</div>
+            <p class="muted" style="font-size:.82rem">Asking for info and rejecting need a note.</p>` : '<p class="muted">This request is closed.</p>'}</section>
+          <section class="p-card"><h3>Timeline</h3><ol class="timeline">${r.events.map((e) => `<li><b>${T.staffStatus[e.to]}</b><span class="when">${fmtTime(e.at)} · ${e.by === 'tourist' ? 'tourist' : 'staff'}</span>${e.note ? `<span class="note">${esc(e.note)}</span>` : ''}</li>`).join('')}</ol></section>
+        </div>
+      </div>`;
+  }
+
+  function rulesScreen() {
+    const pt = S.portal, admin = pt.role === 'admin', today = todayColombo();
+    const rows = S.rules.map((r) => ({ ...r, name: countryName(r.code), stale: (utc(today) - utc(r.verified)) / DAY > 90 })).sort((a, b) => a.name.localeCompare(b.name));
+    const stale = rows.filter((r) => r.stale).length;
+    return `<div class="p-head"><div><h2>Visa rules</h2><p class="muted">${rows.length} countries. Nationalities not listed see "Our team will check" in the app. ${admin ? 'Check each rule against eta.gov.lk and save to mark it verified today.' : 'Only admins can edit. Switch to Admin at the top right.'}</p></div></div>
+      <p class="notice">Starter list only: countries that news reports (May 2026) name as getting the free 30-day ETA. Confirm the full official list on eta.gov.lk before launch.</p>
+      ${stale ? `<p class="notice">${stale} rules were last checked more than 90 days ago.</p>` : ''}
+      ${admin ? `<section class="p-card"><h3>Add a country</h3><div class="rule-form">
+        <label>Country<select id="r-new-code">${countryOptions('')}</select></label>
+        <label>ETA fee (US$)<input id="r-new-fee" type="number" min="0" step="1" placeholder="0 = free"></label>
+        <label>Max stay (days)<input id="r-new-stay" type="number" min="1" step="1" value="30"></label>
+        <button type="button" class="p-btn" data-a="r-add">Add country</button><span class="err" id="r-err"></span></div></section>` : ''}
+      <div class="table-wrap"><table><thead><tr><th>Country</th><th>Code</th><th>ETA fee</th><th>Max stay</th><th>Verified</th>${admin ? '<th><span hidden>Actions</span></th>' : ''}</tr></thead><tbody>
+      ${rows.map((r) => pt.editRule === r.code ? `<tr><td><b>${esc(r.name)}</b></td><td>${r.code}</td><td colspan="${admin ? 4 : 3}"><div class="rule-form">
+          <label>ETA fee (US$)<input id="r-fee" type="number" min="0" step="1" value="${r.fee}"></label>
+          <label>Max stay (days)<input id="r-stay" type="number" min="1" step="1" value="${r.maxStay}"></label>
+          <button type="button" class="p-btn" data-a="r-save" data-code="${r.code}">Save</button><button type="button" class="p-btn sec" data-a="r-cancel">Cancel</button><span class="err" id="r-err"></span></div></td></tr>`
+        : `<tr class="${r.stale ? 'stale' : ''}"><td><b>${esc(r.name)}</b></td><td>${r.code}</td><td class="num">${r.fee === 0 ? 'Free' : `US$${r.fee}`}</td><td class="num">${r.maxStay} days</td><td class="num verified">${fmtDate(r.verified)}</td>${admin ? `<td><button type="button" class="p-btn sec" data-a="r-edit" data-code="${r.code}">Edit</button></td>` : ''}</tr>`).join('')}
+      </tbody></table></div>`;
+  }
+
+  function validatePortal() {
+    const note = document.getElementById('p-note');
+    if (!note) return;
+    document.querySelectorAll('[data-needs-note]').forEach((b) => { b.disabled = !note.value.trim(); });
+  }
+
+  // ------------------------------------------------------------------ render
+  const appEl = document.getElementById('app'), portalEl = document.getElementById('portal');
+  function renderNotif() {
+    document.getElementById('notif-slot').innerHTML = notif
+      ? `<button type="button" class="notif" data-a="notif-open" data-id="${notif.reqId}"><span class="icon" aria-hidden="true">L</span><span><small>LANKA READY · now</small><b>${esc(notif.title)}</b><span>${esc(notif.body)}</span></span></button>` : '';
+  }
+  function renderAll() {
+    appEl.innerHTML = phoneScreen();
+    const pt = S.portal;
+    portalEl.innerHTML = portalShell(pt.screen === 'detail' ? detail() : pt.screen === 'rules' ? rulesScreen() : inbox());
+    renderNotif();
+    validatePhone();
+    validatePortal();
+    save();
+  }
+  function setView(v) {
+    S.view = v;
+    document.getElementById('stage').dataset.view = v;
+    document.querySelectorAll('.seg button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.view === v)));
+    try { if (location.hash !== '#' + v) history.replaceState(null, '', '#' + v); } catch (e) { /* hash not available */ }
+    save();
+  }
+
+  // ------------------------------------------------------------------ actions
+  function flash(msg) { S.portal.flash = msg; setTimeout(() => { if (S.portal.flash === msg) { S.portal.flash = null; renderAll(); } }, 4000); }
+
+  const actions = {
+    back,
+    'send-code'() { const p = P(); p.email = document.getElementById('ph-email').value.trim().toLowerCase(); go('code'); },
+    verify() {
+      const p = P();
+      const existing = S.tourists.find((t) => t.email === p.email);
+      if (existing) { p.me = existing.id; p.unread = false; go('home', { replace: true }); return; }
+      p.draft = { name: '', phoneRaw: '', nat: '', arrival: '', departure: '', has: null, issuedBy: '', number: '', expiry: '', idp: null };
+      go('about');
+    },
+    'about-next'() { go('trip'); },
+    'trip-next'() { go('licence'); },
+    'lic-has'(el) { const d = P().draft; d.has = el.dataset.v === '1'; if (d.has && !d.issuedBy) d.issuedBy = d.nat; renderAll(); },
+    'lic-idp'(el) { P().draft.idp = el.dataset.v === '1'; renderAll(); },
+    finish() {
+      const p = P(), d = p.draft;
+      const t = { id: 't-' + uid(), email: p.email, name: d.name.trim(), phone: d.phoneRaw.replace(/[\s\-()]/g, ''), nat: d.nat,
+        trip: { arrival: d.arrival, departure: d.departure },
+        licence: d.has ? { has: true, issuedBy: d.issuedBy, number: d.number.trim(), expiry: d.expiry, idp: !!d.idp } : { has: false } };
+      S.tourists.push(t); p.me = t.id; p.draft = null;
+      go('home', { replace: true });
+    },
+    'sign-out'() { const p = P(); p.me = null; p.email = ''; p.unread = false; notif = null; go('welcome', { replace: true }); },
+    'tab-home'() { P().stack = []; P().screen = 'home'; renderAll(); },
+    'tab-requests'() { const p = P(); p.stack = []; p.unread = false; p.screen = 'requests'; renderAll(); },
+    'new-req'(el) { const p = P(); p.newType = el.dataset.type; p.files = {}; p.draftReq = {}; go('new'); },
+    'open-req'(el) { P().reqId = el.dataset.id; go('request'); },
+    'notif-open'(el) { const p = P(); notif = null; p.unread = false; p.reqId = el.dataset.id; p.stack = ['home']; p.screen = 'request'; renderAll(); },
+    sample(el) { const p = P(); p.files[el.dataset.kind] = sampleDoc(el.dataset.kind, me().name); renderAll(); },
+    'submit-req'() {
+      const p = P(), t = me(), type = p.newType;
+      if (openReq(t.id, type)) { p.error = 'You already have an open request of this type. Open it from the Requests tab.'; renderAll(); return; }
+      if (type === 'eta' && cmp(p.draftReq.ppexp, t.trip.departure) < 0) { p.error = 'Your passport expires before you leave Sri Lanka. Renew it first, then apply.'; renderAll(); return; }
+      const kinds = requiredFiles(type, t.licence && t.licence.idp);
+      const r = { id: 'r-' + uid(), touristId: t.id, type, status: 'submitted', createdAt: Date.now(),
+        details: type === 'eta' ? { passportNumber: p.draftReq.pp.trim(), passportExpiry: p.draftReq.ppexp } : {},
+        docs: kinds.map((k) => ({ kind: k, url: p.files[k] })),
+        events: [{ from: null, to: 'submitted', at: Date.now(), note: null, by: 'tourist' }] };
+      S.requests.push(r); p.files = {}; p.draftReq = {};
+      p.reqId = r.id; p.stack = ['home']; p.screen = 'request';
+      if (S.portal.screen === 'inbox') S.portal.filter = 'open';
+      renderAll();
+    },
+    'reply-kind'(el) { const p = P(); p.replyKind = el.dataset.kind; renderAll(); },
+    'sample-reply'(el) { const p = P(); p.replyKind = el.dataset.kind; p.replyFile = sampleDoc(el.dataset.kind, me().name); renderAll(); },
+    'send-reply'(el) {
+      const p = P(), r = req(p.reqId);
+      const note = (document.getElementById('ph-reply').value || '').trim();
+      if (!note && !p.replyFile) { p.error = 'Write a message or add a photo.'; renderAll(); return; }
+      if (p.replyFile) r.docs.push({ kind: el.dataset.kind, url: p.replyFile });
+      changeStatus(r, 'in_review', 'tourist', note || 'New photo added.');
+      p.replyFile = null; p.replyKind = null; renderAll();
+    },
+    cancel() { P().confirmCancel = true; renderAll(); },
+    'cancel-no'() { P().confirmCancel = false; renderAll(); },
+    'cancel-yes'() { const p = P(); changeStatus(req(p.reqId), 'cancelled', 'tourist'); p.confirmCancel = false; renderAll(); },
+    'view-doc'(el) {
+      const r = req(el.dataset.id), d = r.docs[Number(el.dataset.i)];
+      document.getElementById('viewer-slot').innerHTML = `<div class="viewer" data-a="close-viewer"><figure><img src="${d.url}" alt="${T.doc[d.kind]}"><figcaption>${T.doc[d.kind]}<button type="button" class="p-btn sec" data-a="close-viewer">Close</button></figcaption></figure></div>`;
+    },
+    'close-viewer'() { document.getElementById('viewer-slot').innerHTML = ''; },
+    'p-nav'(el) { const pt = S.portal; pt.screen = el.dataset.to; pt.editRule = null; pt.attach = null; renderAll(); },
+    'p-open'(el) { const pt = S.portal; pt.reqId = el.dataset.id; pt.screen = 'detail'; pt.attach = null; renderAll(); },
+    'p-sample-attach'(el) { const r = req(S.portal.reqId); S.portal.attach = sampleDoc(el.dataset.kind, tourist(r.touristId).name); renderAll(); },
+    'p-move'(el) {
+      const pt = S.portal, r = req(pt.reqId), to = el.dataset.to;
+      const note = (document.getElementById('p-note').value || '').trim();
+      if (NOTE_REQUIRED.includes(to) && !note) return;
+      if (to === 'completed' && pt.attach) r.docs.push({ kind: r.type === 'eta' ? 'eta_approval' : 'permit', url: pt.attach, by: 'staff' });
+      changeStatus(r, to, 'staff', note);
+      pt.attach = null;
+      const name = tourist(r.touristId).name.split(' ')[0];
+      flash(to === 'in_review' ? `Review started. ${name} got a notification.` : to === 'needs_info' ? `Sent to ${name}. Their phone shows the alert.` : to === 'completed' ? `Completed. ${name} got a notification.` : `Rejected. ${name} got a notification.`);
+      renderAll();
+    },
+    'r-edit'(el) { S.portal.editRule = el.dataset.code; renderAll(); },
+    'r-cancel'() { S.portal.editRule = null; renderAll(); },
+    'r-save'(el) {
+      const fee = Number(document.getElementById('r-fee').value), stay = Number(document.getElementById('r-stay').value);
+      const err = document.getElementById('r-err');
+      if (!(fee >= 0)) { err.textContent = 'Fee must be 0 or more (0 means free).'; return; }
+      if (!Number.isInteger(stay) || stay < 1) { err.textContent = 'Maximum stay must be at least 1 day.'; return; }
+      const r = S.rules.find((x) => x.code === el.dataset.code);
+      Object.assign(r, { fee, maxStay: stay, verified: todayColombo() });
+      S.portal.editRule = null; flash(`${countryName(r.code)} saved. The app uses it straight away.`); renderAll();
+    },
+    'r-add'() {
+      const code = document.getElementById('r-new-code').value, feeRaw = document.getElementById('r-new-fee').value, stay = Number(document.getElementById('r-new-stay').value);
+      const err = document.getElementById('r-err'), fee = Number(feeRaw);
+      if (!code) { err.textContent = 'Choose a country.'; return; }
+      if (feeRaw === '' || !(fee >= 0)) { err.textContent = 'Fee must be 0 or more (0 means free).'; return; }
+      if (!Number.isInteger(stay) || stay < 1) { err.textContent = 'Maximum stay must be at least 1 day.'; return; }
+      const existing = S.rules.find((x) => x.code === code);
+      if (existing) Object.assign(existing, { fee, maxStay: stay, verified: todayColombo() });
+      else S.rules.push({ code, fee, maxStay: stay, source: 'https://www.eta.gov.lk/', verified: todayColombo() });
+      flash(`${countryName(code)} saved. The app uses it straight away.`); renderAll();
+    },
+  };
+
+  document.addEventListener('click', (e) => {
+    const el = e.target.closest('[data-a]');
+    if (!el) return;
+    if (el.classList.contains('viewer') && e.target !== el) return; // clicks inside the viewer figure
+    const fn = actions[el.dataset.a];
+    if (fn && !el.disabled) { e.preventDefault(); fn(el); }
+  });
+  document.addEventListener('input', (e) => {
+    if (e.target.closest('#app')) validatePhone();
+    if (e.target.id === 'p-note') validatePortal();
+  });
+  document.addEventListener('change', async (e) => {
+    const el = e.target;
+    if (el.closest('#app') && el.tagName === 'SELECT') validatePhone();
+    if (el.id === 'p-role') { S.portal.role = el.value; S.portal.editRule = null; renderAll(); return; }
+    if (el.id === 'p-filter') { S.portal.filter = el.value; renderAll(); return; }
+    if (el.id === 'p-type') { S.portal.type = el.value; renderAll(); return; }
+    if (el.dataset && el.dataset.file && el.files && el.files[0]) {
+      const url = await shrinkImage(el.files[0]);
+      const k = el.dataset.file;
+      if (k === 'reply') P().replyFile = url;
+      else if (k === 'approval') S.portal.attach = url;
+      else P().files[k] = url;
+      renderAll();
+    }
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') actions['close-viewer']();
+    if (e.key === 'Enter' && e.target.matches('#app input')) {
+      const btn = document.querySelector('#app .btn:not(:disabled):not(.soft):not(.danger)');
+      if (btn) btn.click();
+    }
+  });
+  document.querySelectorAll('.seg button').forEach((b) => b.addEventListener('click', () => setView(b.dataset.view)));
+  const resetBtn = document.getElementById('reset');
+  let resetArmed = false;
+  resetBtn.addEventListener('click', () => {
+    if (!resetArmed) { resetArmed = true; resetBtn.textContent = 'Click again to reset'; setTimeout(() => { resetArmed = false; resetBtn.textContent = 'Reset demo'; }, 3000); return; }
+    resetArmed = false; resetBtn.textContent = 'Reset demo';
+    S = seed(); notif = null; setView('both'); renderAll();
+  });
+
+  function tick() { const d = new Date(Date.now() + 330 * 60000); document.getElementById('clock').textContent = `${d.getUTCHours()}:${String(d.getUTCMinutes()).padStart(2, '0')}`; }
+  tick(); setInterval(tick, 30000);
+
+  const fromHash = (location.hash || '').replace('#', '');
+  setView(['app', 'portal', 'both'].includes(fromHash) ? fromHash : (S.view || 'both'));
+  window.addEventListener('hashchange', () => { const h = location.hash.replace('#', ''); if (['app', 'portal', 'both'].includes(h)) setView(h); });
+  renderAll();
+})();
+</script>
+</body></html>

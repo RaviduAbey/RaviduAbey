@@ -9,6 +9,10 @@ This is **Milestone 1** of the plan: sign-up, visa (ETA) and driving checks, hel
 
 > "Lanka Ready" is a placeholder name. Change it in `apps/mobile/app.json`, `apps/mobile/src/strings.ts` and `apps/portal/src/strings.ts`.
 
+## Clickable demo (no setup)
+
+`demo/index.html` is a single-file, clickable version of the tourist app and staff portal, wired together with demo data stored in the browser. Open it in any browser. Add `#app` to the address to show only the phone app (good for showing on a phone) or `#portal` for only the portal. It is for showing the idea. The real apps below use the real database.
+
 ## What it does
 
 **Tourist app** (`apps/mobile`, Expo / React Native)
