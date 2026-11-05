@@ -137,16 +137,50 @@ Portal:
 
 ## Later milestones (each gets its own spec + plan)
 
-- **M2 Itinerary booking:** day-by-day plan between arrival and departure;
-  hotels and transfers requested through the same `service_requests` pipeline
-  (new type `itinerary`), staff build/quote in portal.
-- **M3 Activities:** catalogue managed in portal (safari, whale watching,
-  train rides…), tourist books into itinerary days; availability and price.
-- **M4 Car rental:** self-drive offered only when the driving assessment is
-  `eligible_for_permit` and the permit request is `completed`; otherwise car
-  with driver. Fleet and bookings managed in portal.
-- **Payments** (cross-cutting, before public launch): ETA fee, permit fee,
-  bookings.
+Shareable overview with journey map: https://claude.ai/artifact/DDTMX3jwe7uGq5tkeBibmM
+
+### M2 Itinerary booking
+- Tourist: picks interests (beaches, culture, wildlife, tea country), pace,
+  budget, group size; starts from a route template (e.g. 7-day Cultural
+  Triangle, 10-day south coast); swaps hotels, reorders days; asks for a
+  custom plan; views plan offline.
+- Team: maintains route templates and partner hotels/rates; quotes custom
+  plans (tourist accepts in app); books inter-city transfers; handles
+  mid-trip changes.
+- Builds on: M1 trip dates; `service_requests` type `itinerary`.
+- Open: instant booking vs. quote-first; own hotel partners vs. reselling.
+
+### M3 Activities
+- Tourist: browses by place/date/interest (safari, whale watching, Ella
+  train, Sigiriya, cooking class, surfing); sees price, duration, pickup;
+  adds to an itinerary day; gets a voucher; seasonal warnings (south-coast
+  whale season Nov–Apr, Yala annual closure).
+- Team: manages providers, activities, time slots and capacity; confirms
+  bookings; sends pickup times.
+- Builds on: M2 itinerary days and hotel locations.
+- Open: launch catalogue; markup vs. provider commission.
+
+### M4 Car rental
+- Tourist: self-drive, car with driver, or tuk-tuk; vehicle size, dates
+  within trip, airport/hotel pickup, child seat; sees driver details.
+- Self-drive offered only when the driving assessment is
+  `eligible_for_permit` and the `driving_permit` request is `completed`;
+  otherwise car with driver.
+- Team: fleet or partner companies, availability calendar, assign vehicle
+  and driver, handover/return record with photos, deposits (after M5).
+- Open: own fleet vs. partners; car-with-driver as default; tuk-tuks at all.
+
+### M5 Payments & launch
+- Card payments for every service, USD and LKR display, receipts, refunds.
+  Gateway must support a Sri Lankan business (e.g. PayHere or a bank
+  gateway; Stripe does not).
+- App Store / Google Play, privacy policy under Sri Lanka's Personal Data
+  Protection Act (passports stored), in-app help line (possibly WhatsApp),
+  post-trip ratings, more languages.
+- Open: which languages first; whether ETA fees move into M1.
+
+### Possible M6: During the trip
+Emergency line, local SIM, currency tips, chat with the team.
 
 ## Left to the builder
 
