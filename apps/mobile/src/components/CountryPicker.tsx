@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { FlatList, Modal, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { COUNTRIES, countryName } from '@/src/data/countries';
+import { COUNTRIES, countryName } from '@tourist/core';
 import { Button, Label } from '@/src/ui/components';
 import { colors, radius, space } from '@/src/ui/theme';
 
