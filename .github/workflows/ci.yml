@@ -1,0 +1,55 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Unit tests (core, mobile, portal)
+        run: pnpm test
+
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+
+      - name: Edge function tests
+        run: deno test --allow-net=jsr.io supabase/functions
+
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Start Supabase
+        run: supabase start -x studio,imgproxy,vector,logflare,postgres-meta,supavisor
+
+      - name: Database tests
+        run: supabase test db
+
+      - name: Portal end-to-end tests
+        run: |
+          npx playwright install --with-deps chromium
+          ANON_KEY=$(supabase status -o json | jq -r .ANON_KEY)
+          printf 'NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321\nNEXT_PUBLIC_SUPABASE_ANON_KEY=%s\n' "$ANON_KEY" > apps/portal/.env.local
+          pnpm --filter portal e2e
+        env:
+          CI: true
