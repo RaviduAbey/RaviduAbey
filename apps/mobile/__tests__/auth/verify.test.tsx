@@ -1,5 +1,5 @@
 import { render, screen, userEvent } from '@testing-library/react-native';
-import Verify from './verify';
+import Verify from '@/app/(auth)/verify';
 
 const mockVerifyOtp = jest.fn().mockResolvedValue({ error: null });
 

@@ -1,13 +1,11 @@
 import { compareDates, type DocumentKind, type IsoDate, type RequestType } from '@tourist/core';
 import { supabase } from '@/src/lib/supabase';
+import { requiredFiles } from './requiredFiles';
 import { uploadDocument } from './uploadDocument';
 
 export type SubmitError = 'already_open' | 'missing_files' | 'passport_expires_before_departure' | 'upload_failed' | 'unknown';
 
-export function requiredFiles(type: RequestType, hasIdp: boolean): DocumentKind[] {
-  if (type === 'eta_application') return ['passport'];
-  return hasIdp ? ['licence_front', 'licence_back', 'photo', 'idp'] : ['licence_front', 'licence_back', 'photo'];
-}
+export { requiredFiles };
 
 export async function submitRequest(args: {
   profileId: string;

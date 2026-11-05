@@ -1,5 +1,5 @@
 import { render, screen, userEvent } from '@testing-library/react-native';
-import SignIn from './sign-in';
+import SignIn from '@/app/(auth)/sign-in';
 
 const mockPush = jest.fn();
 const mockSignInWithOtp = jest.fn().mockResolvedValue({ error: null });

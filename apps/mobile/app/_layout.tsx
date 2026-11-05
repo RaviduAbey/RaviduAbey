@@ -1,14 +1,23 @@
+import * as Notifications from 'expo-notifications';
 import { Stack, useRouter, useSegments } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
+import { Platform } from 'react-native';
 import 'react-native-reanimated';
 import { routeFor } from '@/src/lib/routeFor';
 import { SessionProvider, useSession } from '@/src/lib/session';
+import { registerPush } from '@/src/push/registerPush';
 import { colors } from '@/src/ui/theme';
 
 export { ErrorBoundary } from 'expo-router';
 
 SplashScreen.preventAutoHideAsync();
+
+if (Platform.OS !== 'web') {
+  Notifications.setNotificationHandler({
+    handleNotification: async () => ({ shouldShowBanner: true, shouldShowList: true, shouldPlaySound: false, shouldSetBadge: false }),
+  });
+}
 
 export default function RootLayout() {
   return (
@@ -36,6 +45,23 @@ function RootNav() {
     const allowed = target === 'app' ? APP_SCREENS.has(current) : current === GROUP_FOR_TARGET[target];
     if (!allowed) router.replace(HOME_FOR_TARGET[target]);
   }, [loading, session, profile, segments, router]);
+
+  // Register for push once the person is signed in and set up.
+  const userId = session?.user.id;
+  const ready = !!profile;
+  useEffect(() => {
+    if (userId && ready) void registerPush(userId);
+  }, [userId, ready]);
+
+  // Tapping a notification opens the request it is about.
+  useEffect(() => {
+    if (Platform.OS === 'web') return;
+    const sub = Notifications.addNotificationResponseReceivedListener((response) => {
+      const requestId = response.notification.request.content.data?.requestId;
+      if (typeof requestId === 'string') router.push(`/requests/${requestId}`);
+    });
+    return () => sub.remove();
+  }, [router]);
 
   return (
     <Stack

@@ -1,5 +1,5 @@
 import { render, screen, userEvent } from '@testing-library/react-native';
-import Trip from './trip';
+import Trip from '@/app/onboarding/trip';
 import { DraftProvider } from '@/src/onboarding/draft';
 
 jest.mock('expo-router', () => ({ useRouter: () => ({ push: jest.fn() }) }));

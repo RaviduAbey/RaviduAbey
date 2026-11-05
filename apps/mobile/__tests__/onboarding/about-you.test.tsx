@@ -1,5 +1,5 @@
 import { render, screen, userEvent } from '@testing-library/react-native';
-import AboutYou from './about-you';
+import AboutYou from '@/app/onboarding/about-you';
 import { DraftProvider } from '@/src/onboarding/draft';
 
 const mockPush = jest.fn();
