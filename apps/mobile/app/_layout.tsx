@@ -33,25 +33,24 @@ const HOME_FOR_TARGET = { auth: '/sign-in', onboarding: '/onboarding/about-you',
 const APP_SCREENS = new Set(['(tabs)', 'request', 'requests']);
 
 function RootNav() {
-  const { loading, session, profile } = useSession();
+  const { loading, session, onboarded } = useSession();
   const segments = useSegments();
   const router = useRouter();
 
   useEffect(() => {
-    const target = routeFor({ loading, hasSession: !!session, hasProfile: !!profile });
+    const target = routeFor({ loading, hasSession: !!session, hasProfile: onboarded });
     if (!target) return;
     SplashScreen.hideAsync();
     const current = segments[0] ?? '(tabs)';
     const allowed = target === 'app' ? APP_SCREENS.has(current) : current === GROUP_FOR_TARGET[target];
     if (!allowed) router.replace(HOME_FOR_TARGET[target]);
-  }, [loading, session, profile, segments, router]);
+  }, [loading, session, onboarded, segments, router]);
 
   // Register for push once the person is signed in and set up.
   const userId = session?.user.id;
-  const ready = !!profile;
   useEffect(() => {
-    if (userId && ready) void registerPush(userId);
-  }, [userId, ready]);
+    if (userId && onboarded) void registerPush(userId);
+  }, [userId, onboarded]);
 
   // Tapping a notification opens the request it is about.
   useEffect(() => {

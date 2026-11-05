@@ -1,6 +1,6 @@
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(16);
+select plan(18);
 
 -- Users: A and B are tourists, C is an agent, D is an admin.
 insert into auth.users (id, email) values
@@ -46,10 +46,16 @@ select throws_ok(
   $$insert into public.service_requests (profile_id, trip_id, type) values ('b0000000-0000-0000-0000-00000000000a', 'b1000000-0000-0000-0000-00000000000b', 'driving_permit')$$,
   '42501', null, 'tourist cannot attach a request to someone else''s trip');
 select lives_ok(
-  $$insert into public.request_documents (request_id, kind, storage_path, uploaded_by) values ('b2000000-0000-0000-0000-00000000000a', 'passport', 'x', 'b0000000-0000-0000-0000-00000000000a')$$,
+  $$insert into public.request_documents (request_id, kind, storage_path, uploaded_by) values ('b2000000-0000-0000-0000-00000000000a', 'passport', 'b0000000-0000-0000-0000-00000000000a/b2000000-0000-0000-0000-00000000000a/passport-1.jpg', 'b0000000-0000-0000-0000-00000000000a')$$,
   'tourist can attach a document to their own request');
 select throws_ok(
-  $$insert into public.request_documents (request_id, kind, storage_path, uploaded_by) values ('b2000000-0000-0000-0000-00000000000b', 'passport', 'x', 'b0000000-0000-0000-0000-00000000000a')$$,
+  $$insert into public.request_documents (request_id, kind, storage_path, uploaded_by) values ('b2000000-0000-0000-0000-00000000000a', 'eta_approval', 'b0000000-0000-0000-0000-00000000000a/b2000000-0000-0000-0000-00000000000a/eta_approval-1.pdf', 'b0000000-0000-0000-0000-00000000000a')$$,
+  '42501', null, 'tourist cannot attach an approval (staff-only document)');
+select throws_ok(
+  $$insert into public.request_documents (request_id, kind, storage_path, uploaded_by) values ('b2000000-0000-0000-0000-00000000000a', 'passport', 'b0000000-0000-0000-0000-00000000000b/b2000000-0000-0000-0000-00000000000b/passport-2.jpg', 'b0000000-0000-0000-0000-00000000000a')$$,
+  '42501', null, 'tourist cannot point a document at a file outside their request folder');
+select throws_ok(
+  $$insert into public.request_documents (request_id, kind, storage_path, uploaded_by) values ('b2000000-0000-0000-0000-00000000000b', 'passport', 'b0000000-0000-0000-0000-00000000000b/b2000000-0000-0000-0000-00000000000b/p.jpg', 'b0000000-0000-0000-0000-00000000000a')$$,
   '42501', null, 'tourist cannot attach a document to another request');
 select is((select count(*)::int from storage.objects where bucket_id = 'documents' and name like 'b000%'), 1, 'tourist sees only their own files');
 select throws_ok(

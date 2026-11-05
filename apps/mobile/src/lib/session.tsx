@@ -8,6 +8,8 @@ export type ProfileRow = Tables<'profiles'>;
 interface SessionState {
   session: Session | null;
   profile: ProfileRow | null;
+  /** True once sign-up finished: a profile and at least one trip exist. */
+  onboarded: boolean;
   loading: boolean;
   refreshProfile(): Promise<void>;
 }
@@ -17,15 +19,21 @@ const SessionContext = createContext<SessionState | null>(null);
 export function SessionProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<ProfileRow | null>(null);
+  const [onboarded, setOnboarded] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const loadProfile = useCallback(async (s: Session | null) => {
     if (!s) {
       setProfile(null);
+      setOnboarded(false);
       return;
     }
-    const { data } = await supabase.from('profiles').select('*').eq('id', s.user.id).maybeSingle();
+    const [{ data }, trips] = await Promise.all([
+      supabase.from('profiles').select('*').eq('id', s.user.id).maybeSingle(),
+      supabase.from('trips').select('id').eq('profile_id', s.user.id).limit(1),
+    ]);
     setProfile(data ?? null);
+    setOnboarded(!!data && (trips.data?.length ?? 0) > 0);
   }, []);
 
   useEffect(() => {
@@ -49,7 +57,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   const refreshProfile = useCallback(() => loadProfile(session), [loadProfile, session]);
 
   return (
-    <SessionContext.Provider value={{ session, profile, loading, refreshProfile }}>{children}</SessionContext.Provider>
+    <SessionContext.Provider value={{ session, profile, onboarded, loading, refreshProfile }}>{children}</SessionContext.Provider>
   );
 }
 
