@@ -68,3 +68,10 @@ insert into public.trips (id, profile_id, arrival_date, departure_date) values
   ('00000000-0000-4000-b000-00000000a001', '00000000-0000-4000-a000-00000000a001', '2027-01-12', '2027-02-02');
 insert into public.licences (profile_id, has_licence, issuing_country_iso2, licence_number, expiry_date, has_idp) values
   ('00000000-0000-4000-a000-00000000a001', true, 'AU', 'DEMO-123456', '2030-06-30', true);
+
+-- ---------------------------------------------------------------------------
+-- Push notifications (local): the request_events trigger calls the
+-- notify-status edge function through the local API gateway.
+-- ---------------------------------------------------------------------------
+select vault.create_secret('http://supabase_kong_RaviduAbey:8000/functions/v1/notify-status', 'notify_status_url');
+select vault.create_secret('local-dev-notify-secret', 'notify_webhook_secret');

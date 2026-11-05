@@ -390,8 +390,9 @@ inspector_port = 8083
 # The Deno major version to use.
 deno_version = 2
 
-# [edge_runtime.secrets]
-# secret_key = "env(SECRET_VALUE)"
+[edge_runtime.secrets]
+# Local development only. In production set it with `supabase secrets set NOTIFY_WEBHOOK_SECRET=...`.
+NOTIFY_WEBHOOK_SECRET = "local-dev-notify-secret"
 
 [analytics]
 enabled = true
@@ -429,3 +430,7 @@ content_path = "./supabase/templates/otp.html"
 [auth.email.template.confirmation]
 subject = "Your sign-in code"
 content_path = "./supabase/templates/otp.html"
+
+# Called by the database (shared secret header), not by signed-in users.
+[functions.notify-status]
+verify_jwt = false
