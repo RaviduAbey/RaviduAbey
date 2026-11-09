@@ -1,0 +1,518 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>tourty pitch</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@500;600;700;800;900&display=swap">
+<style>
+:root { --sky: #1ba6df; --sky-soft: #d9f0fb; --navy: #0b2a3d; --ink: #0b2a3d; --muted: #4c6675; --yellow: #f6e21e; --blue: #0a6fa8; --sea: #cdebf8; --land: #fbf9ef; --edge: #7fc4e4; --white: #fff; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 1080px; height: 1920px; overflow: hidden; background: var(--navy); font-family: "Nunito", system-ui, sans-serif; color: var(--ink); }
+.scene { position: absolute; inset: 0; overflow: hidden; opacity: 0; }
+.wordmark { font-family: "Fredoka", sans-serif; font-weight: 700; color: #fff; display: inline-flex; align-items: flex-end; line-height: .9; letter-spacing: -0.02em; }
+.wordmark svg { width: .5em; height: .5em; fill: var(--yellow); margin-left: -.1em; margin-bottom: -.08em; }
+.spark { fill: var(--yellow); }
+.disp { font-family: "Fredoka", sans-serif; font-weight: 600; line-height: 1.02; letter-spacing: -0.01em; }
+.chip { display: inline-flex; align-items: center; gap: 14px; background: var(--navy); color: #fff; border-radius: 999px; padding: 14px 30px; font: 800 30px "Nunito"; letter-spacing: .04em; }
+.chip i { font-style: normal; color: var(--yellow); }
+.photo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.abs { position: absolute; }
+
+/* S1 + S2: dark problem stage */
+#s1, #s2 { background: radial-gradient(120% 80% at 50% 40%, #12405c 0%, #0b2a3d 60%, #071c29 100%); }
+.word { position: absolute; left: 0; right: 0; text-align: center; color: #fff; font-size: 150px; }
+.word.y { color: var(--yellow); }
+.tag { position: absolute; background: #fff; color: var(--navy); border-radius: 999px; padding: 26px 46px; font: 600 68px "Fredoka"; box-shadow: 0 20px 50px rgb(0 0 0 / 35%); white-space: nowrap; }
+.tag b { color: var(--blue); }
+.many { position: absolute; left: 0; right: 0; text-align: center; color: #fff; font-size: 104px; }
+.many.y { color: var(--yellow); }
+
+/* S3 reveal */
+#s3 { background: transparent; }
+#s3 .wipe { position: absolute; inset: 0; background: var(--sky); }
+#s3 .lock { position: absolute; left: 0; right: 0; top: 700px; display: grid; justify-items: center; gap: 30px; }
+#s3 .wordmark { font-size: 260px; }
+#s3 .tagl { font: 500 78px "Fredoka"; color: #fff; }
+#s3 .sub { position: absolute; left: 80px; right: 80px; top: 1250px; text-align: center; color: var(--navy); font-size: 64px; }
+.burst { position: absolute; width: 80px; height: 80px; }
+
+/* S4 one app */
+#s4 .shade { position: absolute; inset: 0; background: linear-gradient(180deg, var(--sky) 0%, rgb(27 166 223 / 92%) 28%, rgb(27 166 223 / 0%) 52%); }
+#s4 .big { position: absolute; left: 80px; right: 80px; top: 170px; color: var(--navy); font-size: 140px; }
+#s4 .big span { display: block; }
+
+/* feature scenes */
+.feat-head { position: absolute; left: 80px; right: 80px; top: 130px; display: grid; gap: 26px; justify-items: start; }
+.feat-head h2 { font-size: 104px; color: var(--navy); }
+.feat-head p { font-size: 44px; font-weight: 700; color: var(--navy); opacity: .8; line-height: 1.25; }
+
+/* S5 visa */
+#s5 { background: var(--sky-soft); }
+.phone { position: absolute; left: 50%; top: 640px; width: 700px; height: 1480px; margin-left: -350px; background: #0f1a20; border-radius: 96px; padding: 22px; box-shadow: 0 40px 90px rgb(11 42 61 / 25%); }
+.phone .scr { width: 100%; height: 100%; background: #f3f9fc; border-radius: 76px; overflow: hidden; position: relative; padding: 120px 40px 0; display: grid; gap: 28px; align-content: start; }
+.phone .notch { position: absolute; top: 26px; left: 50%; width: 200px; height: 52px; margin-left: -100px; background: #0f1a20; border-radius: 30px; }
+.phone .hello { font: 600 54px "Fredoka"; }
+.ticket { background: #fff; border: 2px solid #d3e6ef; border-radius: 34px; overflow: hidden; position: relative; }
+.ticket .main { padding: 30px; display: grid; grid-template-columns: 92px 1fr; gap: 24px; }
+.ticket .ic { width: 92px; height: 92px; border-radius: 26px; background: #dcf0fa; display: grid; place-items: center; }
+.ticket .ic svg { width: 50px; height: 50px; stroke: var(--blue); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.ticket .kicker { font-size: 24px; font-weight: 800; letter-spacing: .08em; color: var(--muted); text-transform: uppercase; }
+.ticket h3 { font: 600 40px/1.15 "Fredoka"; margin: 6px 0 8px; }
+.ticket p { font-size: 28px; color: var(--muted); line-height: 1.35; }
+.ticket .stub { border-top: 3px dashed #d3e6ef; padding: 24px 30px; display: flex; justify-content: space-between; align-items: center; font-size: 26px; color: var(--muted); }
+.btn { background: var(--yellow); color: var(--navy); font-weight: 900; font-size: 30px; border-radius: 999px; padding: 20px 34px; position: relative; overflow: hidden; }
+.btn.done { background: #dcf0fa; color: var(--blue); }
+.ripple { position: absolute; left: 50%; top: 50%; width: 30px; height: 30px; margin: -15px; border-radius: 50%; background: rgb(11 42 61 / 25%); }
+.stampx { position: absolute; left: 180px; top: 1060px; width: 720px; text-align: center; border: 14px solid #1a8a4a; color: #1a8a4a; border-radius: 30px; padding: 22px 0; font: 700 120px "Fredoka"; letter-spacing: .08em; background: rgb(255 255 255 / 75%); }
+.stampx small { display: block; font: 800 34px "Nunito"; letter-spacing: .12em; }
+
+/* S6 map */
+#s6 { background: var(--sea); }
+#s6 svg.map { position: absolute; left: 70px; top: 470px; width: 940px; height: 1445px; }
+.map .land { fill: var(--land); stroke: var(--edge); stroke-width: 1.4; }
+.map .casing { fill: none; stroke: #fff; stroke-width: 6; stroke-linecap: round; }
+.map .route { fill: none; stroke: var(--blue); stroke-width: 3; stroke-linecap: round; }
+.map .pin circle { fill: var(--yellow); stroke: var(--navy); stroke-width: 1.6; }
+.map .pin .n { font: 700 10px "Fredoka"; fill: var(--navy); text-anchor: middle; }
+.map .pin .l { font: 900 11px "Nunito"; fill: var(--navy); paint-order: stroke; stroke: var(--land); stroke-width: 5px; stroke-linejoin: round; }
+.map .air circle { fill: var(--blue); }
+.map .plane { fill: var(--navy); }
+.counter { position: absolute; right: 80px; top: 360px; background: #fff; border-radius: 30px; padding: 22px 34px; box-shadow: 0 16px 40px rgb(11 42 61 / 15%); font: 600 46px "Fredoka"; color: var(--navy); }
+.counter b { color: var(--blue); font-weight: 700; font-variant-numeric: tabular-nums; }
+
+/* S7 cards */
+#s7 { background: var(--sky); }
+.card { position: absolute; width: 760px; background: #fff; border-radius: 44px; overflow: hidden; box-shadow: 0 30px 70px rgb(11 42 61 / 30%); }
+.card img { width: 100%; height: 400px; object-fit: cover; display: block; }
+.card .body { padding: 26px 34px 32px; display: grid; gap: 10px; }
+.card .badge { width: fit-content; background: #fbf5c2; border-radius: 999px; padding: 8px 20px; font-weight: 900; font-size: 26px; }
+.card h3 { font: 600 46px "Fredoka"; }
+.card p { font-size: 28px; color: var(--muted); font-weight: 700; }
+
+/* S8 getting around */
+#s8 { background: var(--sky-soft); }
+#s8 .hero { position: absolute; left: 80px; right: 80px; top: 560px; height: 560px; border-radius: 48px; overflow: hidden; box-shadow: 0 30px 70px rgb(11 42 61 / 22%); }
+#s8 .hero img { width: 100%; height: 100%; object-fit: cover; }
+.road { position: absolute; left: 0; right: 0; top: 1150px; height: 150px; }
+.road .lane { position: absolute; left: 0; right: 0; top: 118px; height: 8px; background: repeating-linear-gradient(90deg, #9ec7da 0 40px, transparent 40px 80px); }
+.opts { position: absolute; left: 80px; right: 80px; top: 1330px; display: grid; gap: 20px; }
+.opt { background: #fff; border: 3px solid #d3e6ef; border-radius: 36px; padding: 26px 36px; display: grid; gap: 6px; }
+.opt b { font: 600 44px "Fredoka"; display: flex; gap: 16px; align-items: center; }
+.opt span { font-size: 28px; color: var(--muted); font-weight: 700; }
+.opt.on { border-color: var(--blue); background: #dcf0fa; }
+.pill { font: 900 24px "Nunito"; background: var(--yellow); border-radius: 999px; padding: 6px 16px; }
+
+/* S9 team */
+#s9 { background: #f3f9fc; }
+.laptop { position: absolute; left: 60px; top: 620px; width: 960px; }
+.laptop .lid { background: #0f1a20; border-radius: 34px 34px 0 0; padding: 20px; }
+.laptop .base { height: 34px; background: #c9d6dd; border-radius: 0 0 40px 40px; margin: 0 -40px; }
+.portal { background: #f3f9fc; border-radius: 16px; overflow: hidden; }
+.portal .top { background: var(--sky); padding: 18px 26px; display: flex; align-items: baseline; gap: 16px; }
+.portal .top .wordmark { font-size: 50px; }
+.portal .top small { font: 800 22px "Nunito"; color: var(--navy); }
+.portal .rows { padding: 22px; display: grid; gap: 14px; }
+.prow { background: #fff; border: 2px solid #d3e6ef; border-radius: 20px; padding: 20px 24px; display: grid; grid-template-columns: 60px 1fr auto; gap: 18px; align-items: center; font-size: 28px; font-weight: 700; }
+.prow .av { width: 60px; height: 60px; border-radius: 50%; background: #dcf0fa; color: var(--blue); display: grid; place-items: center; font-weight: 900; font-size: 24px; }
+.prow small { display: block; color: var(--muted); font-size: 22px; }
+.status { border-radius: 999px; padding: 8px 20px; font-size: 22px; font-weight: 900; }
+.status.new { background: #e5edfc; color: #1d58c8; }
+.status.rev { background: #dcf0fa; color: var(--blue); }
+.status.done { background: #d8f3e3; color: #1a7a44; }
+.notif { position: absolute; left: 70px; right: 70px; background: rgb(255 255 255 / 97%); border-radius: 46px; padding: 30px 36px; display: grid; grid-template-columns: 96px 1fr; gap: 26px; align-items: start; box-shadow: 0 24px 60px rgb(11 42 61 / 28%); }
+.notif .appic { width: 96px; height: 96px; border-radius: 26px; background: var(--sky); display: grid; place-items: center; }
+.notif .appic .wordmark { font-size: 62px; }
+.notif small { font-size: 24px; font-weight: 900; letter-spacing: .06em; color: var(--muted); }
+.notif b { display: block; font-size: 38px; margin: 4px 0; }
+.notif span { font-size: 30px; color: var(--muted); font-weight: 700; line-height: 1.3; }
+
+/* S10 why now */
+#s10 { background: radial-gradient(120% 80% at 50% 40%, #12405c 0%, #0b2a3d 60%, #071c29 100%); }
+#s10 .lines { position: absolute; left: 80px; right: 80px; top: 360px; display: grid; gap: 34px; color: #fff; }
+#s10 .l1 { font-size: 70px; }
+#s10 .num { font: 700 360px/0.9 "Fredoka"; color: var(--yellow); font-variant-numeric: tabular-nums; }
+#s10 .l2 { font-size: 70px; }
+#s10 .l3 { font-size: 70px; opacity: .85; }
+#s10 .l4 { font-size: 86px; color: var(--yellow); }
+#s10 .src { position: absolute; left: 80px; bottom: 80px; font-size: 24px; color: #a2bccb; font-weight: 700; }
+
+/* S11 end */
+#s11 { background: var(--sky); }
+#s11 .lock { position: absolute; left: 0; right: 0; top: 640px; display: grid; justify-items: center; gap: 26px; }
+#s11 .wordmark { font-size: 240px; }
+#s11 .tagl { font: 500 74px "Fredoka"; color: #fff; }
+#s11 .claim { position: absolute; left: 0; right: 0; top: 1090px; text-align: center; font-size: 70px; color: var(--navy); }
+#s11 .cta { position: absolute; left: 50%; top: 1240px; transform: translateX(-50%); background: var(--yellow); color: var(--navy); border-radius: 999px; padding: 26px 50px; font: 900 40px "Nunito"; white-space: nowrap; box-shadow: 0 16px 40px rgb(11 42 61 / 20%); }
+#s11 .credit { position: absolute; left: 70px; right: 70px; bottom: 60px; text-align: center; font-size: 20px; font-weight: 700; color: var(--navy); opacity: .7; line-height: 1.4; }
+.confetti { position: absolute; left: 0; top: 0; }
+</style>
+</head>
+<body>
+<section class="scene" id="s1">
+  <p class="word disp" id="w1" style="top:620px">Planning</p>
+  <p class="word disp" id="w2" style="top:800px">a holiday in</p>
+  <p class="word disp y" id="w3" style="top:980px">Sri Lanka?</p>
+</section>
+
+<section class="scene" id="s2">
+  <div id="tags"></div>
+  <p class="many disp" id="m1" style="top:1330px">Too many tabs.</p>
+  <p class="many disp y" id="m2" style="top:1460px">Too many questions.</p>
+</section>
+
+<section class="scene" id="s3"><div class="wipe" id="wipe"></div><div id="bursts"></div>
+  <div class="lock"><span class="wordmark" id="logo">tourty<svg id="logoSpark" viewBox="0 0 24 24"><path d="M12 0c1.1 6.2 3.6 9.6 12 12-8.4 2.4-10.9 5.8-12 12-1.1-6.2-3.6-9.6-12-12C8.4 9.6 10.9 6.2 12 0z"/></svg></span><span class="tagl" id="tagl">happiness sorted</span></div>
+  <p class="sub disp" id="sub">Your Sri Lanka holiday, sorted.</p>
+</section>
+
+<section class="scene" id="s4"><img class="photo" id="s4img" src="hi/sigiriya.jpg" alt=""><div class="shade"></div>
+  <h2 class="big disp"><span id="o1">One app.</span><span id="o2">Your whole trip.</span></h2>
+</section>
+
+<section class="scene" id="s5">
+  <div class="feat-head"><span class="chip" id="c5"><i>01</i> Visa and permits</span><h2 class="disp" id="h5">Answered in seconds.</h2><p id="p5">Free or paid ETA, driving permit. We apply for you.</p></div>
+  <div class="phone" id="phone"><div class="scr"><span class="notch"></span>
+    <p class="hello">Hi Nimali, here's what you need</p>
+    <div class="ticket" id="t1"><div class="main"><span class="ic"><svg viewBox="0 0 24 24"><rect x="5" y="2.5" width="14" height="19" rx="2"/><circle cx="12" cy="10" r="3.2"/><path d="M8.5 17h7"/></svg></span><div><span class="kicker">Visa</span><h3>Free ETA. Apply before you fly.</h3><p>Your 15-day stay fits inside the 30-day free ETA.</p></div></div>
+      <div class="stub"><span>We apply on eta.gov.lk</span><span class="btn" id="btn"><span id="btnTxt">Get help applying</span><span class="ripple" id="rip"></span></span></div></div>
+    <div class="ticket" id="t2"><div class="main"><span class="ic"><svg viewBox="0 0 24 24"><path d="M5 17h14v-4.5l-1.8-4.3A2 2 0 0 0 15.4 7H8.6a2 2 0 0 0-1.8 1.2L5 12.5z"/><circle cx="8" cy="17" r="1.8"/><circle cx="16" cy="17" r="1.8"/><path d="M5 12.5h14"/></svg></span><div><span class="kicker">Driving</span><h3>You can drive with a local permit</h3><p>We arrange it before you land.</p></div></div>
+      <div class="stub"><span>Collect it on arrival</span><span class="btn">Get my permit</span></div></div>
+  </div></div>
+  <div class="stampx" id="stamp">APPROVED<small>ELECTRONIC TRAVEL AUTHORISATION</small></div>
+</section>
+
+<section class="scene" id="s6">
+  <div class="feat-head"><span class="chip" id="c6"><i>02</i> Your route</span><h2 class="disp" id="h6">Plan it on a real map.</h2></div>
+  <div class="counter" id="ctr"><b id="ctrStops">0</b> stops · <b id="ctrNights">0</b> nights</div>
+  <svg class="map" viewBox="0 0 270 415" id="map"><path class="land" d="M242.6,285.8 L244.0,293.0 L243.5,297.0 L238.9,312.9 L238.2,318.5 L235.8,324.2 L233.0,328.6 L233.7,331.1 L232.6,334.0 L223.1,348.8 L220.0,351.9 L214.2,356.0 L209.8,357.9 L191.2,372.5 L187.5,374.5 L175.4,378.7 L175.3,377.2 L174.5,376.6 L173.8,376.8 L172.6,380.0 L166.3,383.0 L145.3,387.9 L142.7,388.9 L141.2,391.0 L138.5,390.5 L135.9,391.5 L128.2,397.2 L126.4,399.2 L120.6,399.2 L115.5,402.3 L114.1,402.6 L109.0,400.6 L103.2,401.3 L101.5,400.9 L99.4,397.9 L97.7,398.9 L96.2,399.0 L92.9,398.5 L90.8,397.2 L89.1,397.9 L87.7,396.5 L79.8,394.1 L76.1,391.6 L75.4,392.4 L64.4,381.4 L64.3,380.1 L62.8,378.1 L58.2,368.4 L58.1,365.8 L57.1,363.5 L56.2,358.9 L54.4,355.6 L52.8,349.2 L51.4,347.8 L51.5,347.2 L52.8,347.1 L52.0,341.5 L41.3,314.3 L39.8,306.0 L39.8,298.8 L40.9,296.1 L41.2,293.8 L36.4,276.9 L37.0,274.4 L37.0,276.0 L39.8,282.7 L40.4,282.7 L41.2,281.3 L41.2,278.3 L40.4,275.8 L38.6,275.2 L37.6,274.0 L38.4,271.7 L33.5,236.0 L32.9,234.7 L33.6,234.2 L34.3,234.7 L35.2,229.1 L33.9,226.2 L33.6,220.7 L31.0,208.2 L29.8,205.7 L28.8,200.5 L27.2,196.4 L24.7,185.2 L24.7,182.0 L25.4,182.7 L25.7,180.8 L24.7,173.1 L26.3,172.0 L27.9,170.0 L29.9,164.6 L32.9,160.0 L29.4,166.9 L30.7,168.6 L32.9,169.0 L30.9,173.7 L29.6,174.4 L29.4,178.6 L27.8,183.9 L28.0,186.9 L30.2,189.5 L28.2,193.7 L31.4,196.0 L36.0,196.3 L38.4,194.7 L36.9,191.0 L34.6,188.8 L34.3,187.7 L37.7,181.3 L36.3,177.9 L36.3,173.7 L35.5,172.1 L37.7,167.2 L39.8,151.2 L41.6,148.9 L41.8,143.2 L42.4,141.2 L46.7,137.4 L49.2,130.8 L50.1,121.0 L47.6,114.8 L48.0,106.6 L47.5,103.0 L46.6,101.1 L49.7,100.1 L55.5,94.9 L59.8,92.4 L65.6,75.7 L66.6,71.6 L66.8,65.0 L66.6,64.4 L62.7,62.7 L61.6,61.7 L60.3,55.8 L61.5,54.6 L63.7,53.5 L69.1,52.0 L71.3,49.1 L74.7,47.7 L71.1,42.9 L61.8,37.2 L60.3,35.4 L63.5,35.5 L72.6,40.1 L78.3,41.6 L82.2,44.6 L82.8,45.7 L81.6,46.3 L82.2,47.7 L81.6,48.3 L83.7,49.7 L88.6,48.5 L97.7,45.0 L105.4,46.7 L111.7,49.5 L116.5,50.4 L109.7,45.8 L104.6,44.0 L102.1,42.2 L99.4,42.2 L97.9,43.2 L96.6,42.3 L91.9,42.0 L84.8,35.9 L73.6,30.1 L72.4,30.1 L72.6,32.6 L75.0,35.1 L74.4,36.4 L72.9,36.2 L66.5,31.4 L64.4,30.5 L68.6,34.6 L63.7,33.2 L58.9,30.5 L55.1,27.5 L50.9,25.7 L50.8,26.4 L49.7,25.7 L48.7,22.3 L46.0,18.2 L48.1,17.1 L52.1,13.5 L53.8,12.7 L61.7,13.4 L67.2,13.1 L68.0,17.3 L72.1,18.3 L73.0,19.4 L76.1,18.9 L77.2,19.6 L88.9,32.1 L99.4,37.4 L99.4,36.7 L95.8,34.8 L87.0,27.7 L79.8,19.5 L76.1,17.5 L70.4,16.2 L68.9,15.1 L68.7,13.6 L70.8,12.7 L77.7,12.0 L79.7,12.4 L81.1,13.4 L82.0,16.6 L82.9,18.0 L96.0,33.3 L101.8,36.9 L129.4,59.0 L134.9,65.5 L133.7,66.1 L131.2,64.2 L128.7,64.1 L129.2,65.2 L134.4,69.9 L136.4,71.1 L135.1,68.7 L135.4,67.8 L136.7,67.5 L137.4,68.0 L143.2,80.5 L139.0,79.4 L138.4,80.8 L142.3,82.4 L142.5,84.6 L143.2,84.6 L144.6,83.3 L146.6,88.8 L148.5,91.7 L150.8,93.2 L150.4,94.6 L149.4,94.9 L148.1,92.9 L142.5,90.9 L147.3,95.8 L147.3,97.7 L148.5,98.5 L146.5,100.6 L148.1,101.8 L149.8,101.7 L151.1,100.4 L152.9,97.0 L156.5,101.3 L159.7,106.8 L161.0,108.1 L162.8,108.7 L164.3,109.8 L166.4,115.0 L167.5,116.2 L170.0,117.3 L172.7,125.1 L173.2,123.8 L174.8,124.4 L174.5,125.4 L178.2,129.9 L178.2,131.7 L175.4,134.0 L177.5,133.3 L179.7,138.0 L180.0,140.4 L177.5,140.8 L178.0,139.2 L177.3,137.9 L176.2,137.7 L175.4,139.5 L176.8,142.7 L176.1,144.3 L172.7,141.9 L170.9,141.5 L169.2,142.2 L167.9,144.0 L168.4,144.9 L169.9,144.6 L172.0,142.9 L176.3,147.8 L178.5,148.4 L183.1,148.3 L184.7,147.3 L183.6,145.0 L187.3,143.5 L188.4,143.5 L189.6,144.2 L191.6,146.8 L193.8,155.9 L193.9,158.6 L192.7,157.7 L191.3,155.1 L190.2,154.5 L190.7,158.8 L191.2,160.0 L194.9,161.1 L199.8,182.2 L198.0,184.7 L195.4,175.8 L194.6,175.8 L194.6,181.3 L195.8,182.0 L196.8,184.4 L198.6,185.7 L200.2,185.5 L200.8,183.4 L201.4,183.4 L203.1,188.5 L205.7,192.2 L207.0,195.1 L208.4,193.6 L209.0,196.4 L211.1,195.1 L211.6,196.3 L211.1,199.2 L214.5,203.3 L213.2,203.9 L212.6,206.1 L213.8,209.5 L215.8,211.8 L218.6,211.4 L220.4,215.2 L224.7,219.7 L226.1,221.9 L226.3,223.8 L224.1,224.5 L219.3,219.6 L217.6,219.0 L216.3,219.1 L215.3,220.2 L214.5,222.4 L216.9,223.1 L218.6,221.7 L220.9,222.7 L221.5,223.4 L221.4,224.5 L225.1,228.1 L226.2,229.9 L225.5,231.1 L226.2,232.7 L226.8,232.0 L226.4,230.6 L229.9,232.7 L232.3,238.2 L231.6,240.9 L232.3,242.6 L230.8,244.5 L233.0,247.8 L231.9,248.5 L232.1,249.3 L232.9,249.5 L233.7,248.4 L234.3,248.4 L235.1,254.0 L235.8,254.0 L236.1,251.1 L237.1,249.1 L236.9,247.7 L237.6,247.6 L238.5,248.4 L239.0,251.4 L240.6,253.8 L243.1,262.3Z M228.9,229.0 L227.5,225.1 L228.0,222.2 L227.5,221.0 L228.8,222.3 L232.1,229.5 L234.5,233.4 L235.6,235.1 L237.3,243.9 L237.3,245.9 L235.8,247.1 L234.4,246.0 L233.6,244.3 L233.7,235.7Z M26.4,87.4 L25.3,87.0 L24.8,86.0 L25.1,85.1 L30.9,84.6 L39.2,87.3 L43.2,89.6 L46.7,92.9 L40.4,90.9 L46.0,97.7 L43.6,97.4 L35.0,90.1 L30.9,88.3Z M28.1,45.0 L26.5,46.5 L23.9,46.6 L21.6,45.9 L20.6,44.6 L20.9,39.5 L21.5,39.6 L22.6,41.5 L26.9,42.6Z M44.6,33.3 L43.0,32.1 L41.5,29.8 L39.1,25.1 L40.2,23.3 L41.1,19.4 L43.2,18.9 L44.4,19.3 L43.9,24.0 L44.9,26.7 L45.7,27.2 L47.6,27.1 L48.4,29.5 L52.3,31.6 L52.8,32.6 L52.1,33.3 L50.8,33.3 L47.7,32.1Z"/><g id="route"></g></svg>
+</section>
+
+<section class="scene" id="s7">
+  <div class="feat-head"><span class="chip" id="c7"><i>03</i> Things to do</span><h2 class="disp" id="h7">On the right day.</h2></div>
+  <div class="card" id="k1"><img src="hi/leopard.jpg" alt=""><div class="body"><span class="badge">Yala · Day 9</span><h3>Yala jeep safari</h3><p>Leopards and elephants</p></div></div>
+  <div class="card" id="k2"><img src="hi/ella.jpg" alt=""><div class="body"><span class="badge">Ella · Day 7</span><h3>Scenic train into Ella</h3><p>Over the Nine Arches Bridge</p></div></div>
+  <div class="card" id="k3"><img src="hi/beach.jpg" alt=""><div class="body"><span class="badge">Mirissa · Day 11</span><h3>Whale watching</h3><p>Best from November to April</p></div></div>
+</section>
+
+<section class="scene" id="s8">
+  <div class="feat-head"><span class="chip" id="c8"><i>04</i> Getting around</span><h2 class="disp" id="h8">Car, driver or tuk&#8209;tuk.</h2></div>
+  <div class="hero" id="hero8"><img src="hi/tuktuk.jpg" alt="" id="img8"></div>
+  <div class="road"><div class="lane"></div>
+    <svg id="tuk" class="abs" viewBox="0 0 120 80" width="210" height="140" style="top:0;left:0"><g id="tukBody">
+      <path d="M12 58V30a14 14 0 0 1 14-14h40l22 20h10a8 8 0 0 1 8 8v14z" fill="#d93a2b"/>
+      <path d="M22 16h46l-6-8H28z" fill="#1f2b33"/><path d="M30 24h26v18H30z" fill="#bfe6f7"/><path d="M62 24h6l16 16H62z" fill="#bfe6f7"/>
+      <rect x="8" y="54" width="104" height="8" rx="4" fill="#1f2b33"/>
+      <circle cx="28" cy="64" r="11" fill="#1f2b33"/><circle cx="28" cy="64" r="4" fill="#cfd8dc"/><circle cx="96" cy="64" r="11" fill="#1f2b33"/><circle cx="96" cy="64" r="4" fill="#cfd8dc"/>
+      <rect x="104" y="40" width="8" height="6" rx="2" fill="#f6e21e"/></g></svg>
+  </div>
+  <div class="opts"><div class="opt" id="q1"><b>Car with a driver <span class="pill">Most popular</span></b><span>Follows your route, knows the roads</span></div>
+    <div class="opt" id="q2"><b>Self-drive</b><span>Unlocks once your permit is ready</span></div>
+    <div class="opt" id="q3"><b>Tuk&#8209;tuk</b><span>Ride the island your way</span></div></div>
+</section>
+
+<section class="scene" id="s9">
+  <div class="feat-head"><span class="chip" id="c9"><i>05</i> A local team</span><h2 class="disp" id="h9">Behind every request.</h2></div>
+  <div class="laptop" id="laptop"><div class="lid"><div class="portal"><div class="top"><span class="wordmark">tourty<svg viewBox="0 0 24 24"><path d="M12 0c1.1 6.2 3.6 9.6 12 12-8.4 2.4-10.9 5.8-12 12-1.1-6.2-3.6-9.6-12-12C8.4 9.6 10.9 6.2 12 0z"/></svg></span><small>Operations</small></div>
+    <div class="rows">
+      <div class="prow"><span class="av">NP</span><span>Nimali Perera<small>ETA application</small></span><span class="status new" id="st1">New</span></div>
+      <div class="prow"><span class="av">AD</span><span>Anna Demo<small>Route and hotels</small></span><span class="status new" id="st2">New</span></div>
+      <div class="prow"><span class="av">CL</span><span>Chen Li<small>Car with a driver</small></span><span class="status rev">In review</span></div>
+    </div></div></div><div class="base"></div></div>
+  <div class="notif" id="n1" style="top:1300px"><span class="appic"><span class="wordmark">t<svg viewBox="0 0 24 24"><path d="M12 0c1.1 6.2 3.6 9.6 12 12-8.4 2.4-10.9 5.8-12 12-1.1-6.2-3.6-9.6-12-12C8.4 9.6 10.9 6.2 12 0z"/></svg></span></span><div><small>TOURTY · NOW</small><b>Your ETA is approved</b><span>Have a great trip, Nimali!</span></div></div>
+  <div class="notif" id="n2" style="top:1560px"><span class="appic"><span class="wordmark">t<svg viewBox="0 0 24 24"><path d="M12 0c1.1 6.2 3.6 9.6 12 12-8.4 2.4-10.9 5.8-12 12-1.1-6.2-3.6-9.6-12-12C8.4 9.6 10.9 6.2 12 0z"/></svg></span></span><div><small>TOURTY · NOW</small><b>Your route and hotels are booked</b><span>Your driver meets you at arrivals.</span></div></div>
+</section>
+
+<section class="scene" id="s10">
+  <div class="lines">
+    <p class="l1 disp" id="y1">Since May 2026, visitors from</p>
+    <p class="num" id="y2"><span id="yNum">0</span></p>
+    <p class="l2 disp" id="y3">countries get a free ETA.</p>
+    <p class="l3 disp" id="y4">They still have to apply.</p>
+    <p class="l4 disp" id="y5">tourty makes it one tap.</p>
+  </div>
+  <p class="src" id="ysrc">Source: Sri Lanka free tourist ETA scheme, announced May 2026</p>
+</section>
+
+<section class="scene" id="s11"><canvas class="confetti" id="conf" width="1080" height="1920"></canvas>
+  <div class="lock"><span class="wordmark" id="endLogo">tourty<svg id="endSpark" viewBox="0 0 24 24"><path d="M12 0c1.1 6.2 3.6 9.6 12 12-8.4 2.4-10.9 5.8-12 12-1.1-6.2-3.6-9.6-12-12C8.4 9.6 10.9 6.2 12 0z"/></svg></span><span class="tagl" id="endTag">happiness sorted</span></div>
+  <p class="claim disp" id="claim">Sri Lanka, sorted.</p>
+  <p class="cta" id="cta">Prototype ready to try</p>
+  <p class="credit">Photos via Wikimedia Commons: Sigiriya by Gayomiw, Nine Arches Bridge by Knthabrew, Mirissa by Abishek Palraj, Yala leopard by Casey Klebba (CC BY-SA 4.0); Kandy tuk-tuks by McKay Savage (CC BY 2.0). Map: Natural Earth. Music and sound: original, made for tourty.</p>
+</section>
+
+<script>
+const C = {
+ "hook": [
+  0.25,
+  1.0,
+  1.75
+ ],
+ "tags": [
+  4.0,
+  4.5,
+  5.0,
+  5.5,
+  6.0,
+  6.5
+ ],
+ "tooMany": [
+  7.0,
+  7.5
+ ],
+ "riser": [
+  8.0,
+  10.0
+ ],
+ "drop": 10.0,
+ "tagline": 11.0,
+ "sub": 12.4,
+ "scenes": [
+  14.0,
+  18.0,
+  23.0,
+  30.0,
+  34.0,
+  38.0,
+  42.0,
+  46.0
+ ],
+ "oneApp": [
+  14.4,
+  15.0
+ ],
+ "tap": 19.5,
+ "sent": 20.0,
+ "stamp": 21.0,
+ "map": [
+  24.0,
+  28.5
+ ],
+ "pins": [
+  25.365,
+  25.759,
+  25.947,
+  26.097,
+  26.411,
+  26.968,
+  27.12
+ ],
+ "cards": [
+  30.5,
+  31.3,
+  32.1
+ ],
+ "tuk": [
+  34.3,
+  35.8
+ ],
+ "horn": 35.0,
+ "opts": [
+  35.8,
+  36.2,
+  36.6
+ ],
+ "pick": 37.0,
+ "status": [
+  39.0,
+  39.8
+ ],
+ "notifs": [
+  40.3,
+  41.0
+ ],
+ "why": [
+  42.3,
+  42.7,
+  43.5,
+  44.4
+ ],
+ "end": 46.0,
+ "endText": [
+  46.8,
+  47.6,
+  48.2
+ ],
+ "duration": 50.0
+};
+const $ = (id) => document.getElementById(id);
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const prog = (t, a, b) => clamp((t - a) / (b - a));
+const outCubic = (x) => 1 - Math.pow(1 - x, 3);
+const outBack = (x) => { const c1 = 1.9, c3 = c1 + 1; return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2); };
+const outElastic = (x) => x === 0 || x === 1 ? x : Math.pow(2, -10 * x) * Math.sin((x * 10 - 0.75) * (2 * Math.PI) / 3) + 1;
+const sine = (x) => 0.5 - 0.5 * Math.cos(Math.PI * clamp(x));
+const SPARK = 'M12 0c1.1 6.2 3.6 9.6 12 12-8.4 2.4-10.9 5.8-12 12-1.1-6.2-3.6-9.6-12-12C8.4 9.6 10.9 6.2 12 0z';
+const S = (el, o, tf) => { el.style.opacity = o; if (tf !== undefined) el.style.transform = tf; };
+// Pop: scale from big to 1 with overshoot (kinetic type on the beat).
+const popIn = (el, t, a, from = 1.6, d = 0.45) => { const p = prog(t, a, a + d); S(el, clamp(p * 4), `scale(${from + (1 - from) * outBack(p)})`); };
+const rise = (el, t, a, d = 0.5, dist = 70) => { const p = outCubic(prog(t, a, a + d)); S(el, p, `translateY(${(1 - p) * dist}px)`); };
+const env = (el, t, a, b, fi = 0.25, fo = 0.25) => { const o = Math.min(prog(t, a, a + fi), 1 - prog(t, b - fo, b)); el.style.opacity = o; return o; };
+const SC = C.scenes; // [14,18,23,30,34,38,42,46]
+
+// --- problem tags
+const TAGS = [['Visa', 120, 300, -8], ['Driving permit', 330, 470, 6], ['Hotels', 560, 650, -5], ['Safari', 140, 820, 7], ['Drivers', 520, 990, -6], ['Train tickets', 180, 1150, 4]];
+$('tags').innerHTML = TAGS.map(([w, x, y], i) => `<span class="tag" id="tag${i}" style="left:${x}px;top:${y}px">${w}<b>?</b></span>`).join('');
+
+// --- reveal bursts
+$('bursts').innerHTML = Array.from({ length: 12 }, (_, i) => `<svg class="burst" id="b${i}" viewBox="0 0 24 24" style="left:500px;top:780px"><path class="spark" d="${SPARK}"/></svg>`).join('');
+
+// --- map route
+const P = { airport: [7.18, 79.88], sigiriya: [7.957, 80.76], kandy: [7.29, 80.63], nuwara: [6.97, 80.78], ella: [6.87, 81.05], yala: [6.37, 81.4], mirissa: [5.95, 80.46], galle: [6.03, 80.22] };
+const NAMES = { sigiriya: 'Sigiriya', kandy: 'Kandy', nuwara: 'Nuwara Eliya', ella: 'Ella', yala: 'Yala', mirissa: 'Mirissa', galle: 'Galle' };
+const NIGHTS = [3, 2, 2, 2, 1, 3, 1];
+const LEFT = { kandy: 1, nuwara: 1, galle: 1 };
+const xy = (k) => [(P[k][1] - 79.45) * 100, (9.95 - P[k][0]) * 100];
+const stops = ['sigiriya', 'kandy', 'nuwara', 'ella', 'yala', 'mirissa', 'galle'];
+const keys = ['airport', ...stops, 'airport'];
+let d = '';
+keys.forEach((k, i) => { const [x1, y1] = xy(k); if (!i) { d = `M${x1},${y1}`; return; } const [x0, y0] = xy(keys[i - 1]); d += ` Q${(x0 + x1) / 2 - (y1 - y0) * 0.2},${(y0 + y1) / 2 + (x1 - x0) * 0.2} ${x1},${y1}`; });
+const [ax, ay] = xy('airport');
+$('route').innerHTML = `<path class="casing" d="${d}" id="cas"/><path class="route" d="${d}" id="rp"/><g class="air"><circle cx="${ax}" cy="${ay}" r="8"/></g>` +
+  stops.map((k, i) => { const [x, y] = xy(k); const l = LEFT[k]; return `<g class="pin" id="pin${i}" style="transform-origin:${x}px ${y}px;transform-box:view-box"><circle cx="${x}" cy="${y}" r="9"/><text class="n" x="${x}" y="${y + 3.6}">${i + 1}</text><text class="l" x="${l ? x - 13 : x + 13}" y="${y + 3.8}" text-anchor="${l ? 'end' : 'start'}">${NAMES[k]}</text></g>`; }).join('') +
+  `<g id="plane"><path class="plane" d="M-9,0 L6,-1.6 L9,0 L6,1.6z M-1,0 L-5,-7 L-2.5,-7 L3,-0.8z M-1,0 L-5,7 L-2.5,7 L3,0.8z M-8,0 L-10,-3.5 L-8.6,-3.5 L-6,-0.5z M-8,0 L-10,3.5 L-8.6,3.5 L-6,0.5z"/></g>`;
+const RP = $('rp'), RL = RP.getTotalLength();
+
+// --- confetti (deterministic)
+const conf = $('conf').getContext('2d');
+const COLORS = ['#f6e21e', '#ffffff', '#0b2a3d', '#f6e21e', '#bfe6f7'];
+const PIECES = Array.from({ length: 90 }, (_, i) => { const a = (i / 90) * Math.PI * 2 + (i % 7) * 0.3; const v = 900 + ((i * 137) % 700); return { a, v, spin: ((i * 53) % 9) - 4, size: 14 + (i % 5) * 6, c: COLORS[i % COLORS.length], star: i % 3 === 0 }; });
+function drawConfetti(t) {
+  conf.clearRect(0, 0, 1080, 1920);
+  const dt = t - C.end; if (dt < 0) return;
+  for (const p of PIECES) {
+    const x = 540 + Math.cos(p.a) * p.v * dt * 0.9, y = 820 + Math.sin(p.a) * p.v * dt * 0.9 + 700 * dt * dt;
+    conf.save(); conf.translate(x, y); conf.rotate(p.spin * dt); conf.fillStyle = p.c; conf.globalAlpha = clamp(1 - (dt - 2.2) / 1.2);
+    if (p.star) { conf.scale(p.size / 24, p.size / 24); conf.translate(-12, -12); conf.fill(new Path2D(SPARK)); }
+    else conf.fillRect(-p.size / 2, -p.size / 4, p.size, p.size / 2);
+    conf.restore();
+  }
+}
+
+window.renderAt = function (t) {
+  // ---------- S1 hook (dark)
+  if (env($('s1'), t, -1, C.tags[0] - 0.05, 0.01, 0.2) > 0) {
+    C.hook.forEach((a, i) => popIn($('w' + (i + 1)), t, a, 1.8));
+    $('s1').style.transform = `scale(${1 + 0.03 * prog(t, 0, 4)})`;
+  }
+  // ---------- S2 problem
+  if (env($('s2'), t, C.tags[0] - 0.05, C.drop + 0.05, 0.15, 0.05) > 0) {
+    const shake = prog(t, C.riser[0], C.drop) ** 2 * 18;
+    TAGS.forEach(([, , , rot], i) => {
+      const a = C.tags[i], p = prog(t, a, a + 0.5);
+      const sx = Math.sin(t * 41 + i * 2) * shake, sy = Math.cos(t * 37 + i) * shake;
+      S($('tag' + i), clamp(p * 5), `translate(${sx}px,${sy}px) rotate(${rot * outBack(p)}deg) scale(${0.2 + 0.8 * outBack(p)})`);
+    });
+    popIn($('m1'), t, C.tooMany[0], 1.5); popIn($('m2'), t, C.tooMany[1], 1.5);
+    const sq = 1 - 0.06 * prog(t, C.riser[0], C.drop) ** 3;
+    $('s2').style.transform = `scale(${sq})`;
+    $('s2').style.filter = `brightness(${1 - 0.35 * prog(t, C.riser[0], C.drop)})`;
+  }
+  // ---------- S3 reveal (circle wipe on the drop)
+  if (env($('s3'), t, C.drop - 0.02, SC[0] + 0.05, 0.02, 0.25) > 0) {
+    const w = outCubic(prog(t, C.drop, C.drop + 0.55));
+    $('wipe').style.clipPath = `circle(${w * 130}% at 50% 45%)`;
+    const lp = prog(t, C.drop + 0.12, C.drop + 0.85);
+    S($('logo'), clamp(lp * 4), `scale(${0.3 + 0.7 * outElastic(lp)})`);
+    const sp = outBack(prog(t, C.drop + 0.4, C.drop + 1.0));
+    $('logoSpark').style.transform = `rotate(${(1 - sp) * -200 + 10}deg) scale(${sp})`;
+    for (let i = 0; i < 12; i++) {
+      const b = prog(t, C.drop + 0.25, C.drop + 1.25), ang = (i / 12) * Math.PI * 2, r = outCubic(b) * (380 + (i % 3) * 90);
+      S($('b' + i), b > 0 ? 1 - b : 0, `translate(${Math.cos(ang) * r}px,${Math.sin(ang) * r}px) rotate(${b * 180}deg) scale(${0.6 + (i % 3) * 0.3})`);
+    }
+    rise($('tagl'), t, C.tagline, 0.5, 40);
+    popIn($('sub'), t, C.sub, 1.3);
+    $('s3').style.transform = `scale(${1 + 0.02 * prog(t, C.drop + 1, SC[0])})`;
+  }
+  // ---------- S4 one app
+  if (env($('s4'), t, SC[0] - 0.2, SC[1] + 0.05) > 0) {
+    const p = prog(t, SC[0] - 0.2, SC[1]);
+    $('s4img').style.transform = `translateY(${(1 - outCubic(prog(t, SC[0] - 0.2, SC[0] + 0.5))) * 400}px) scale(${1.2 - 0.12 * p})`;
+    popIn($('o1'), t, C.oneApp[0], 1.5); popIn($('o2'), t, C.oneApp[1], 1.5);
+  }
+  // ---------- S5 visa
+  if (env($('s5'), t, SC[1] - 0.2, SC[2] + 0.05) > 0) {
+    popIn($('c5'), t, SC[1], 0.4); rise($('h5'), t, SC[1] + 0.2); rise($('p5'), t, SC[1] + 0.45);
+    const ph = outCubic(prog(t, SC[1] - 0.1, SC[1] + 0.7)); $('phone').style.transform = `translateY(${(1 - ph) * 800}px) rotate(${(1 - ph) * 8}deg)`;
+    rise($('t1'), t, SC[1] + 0.6, 0.5, 90); rise($('t2'), t, SC[1] + 0.95, 0.5, 90);
+    const tap = prog(t, C.tap, C.tap + 0.5);
+    S($('rip'), tap > 0 && tap < 1 ? 1 - tap : 0, `scale(${tap * 14})`);
+    $('btn').style.transform = `scale(${tap > 0 && tap < 0.35 ? 0.92 : 1})`;
+    const sent = t >= C.sent; $('btn').classList.toggle('done', sent); $('btnTxt').textContent = sent ? 'Request sent ✓' : 'Get help applying';
+    const st = prog(t, C.stamp - 0.18, C.stamp);
+    S($('stamp'), st > 0 ? 1 : 0, `rotate(-12deg) scale(${3 - 2 * st})`);
+    const shake = t > C.stamp ? Math.exp(-(t - C.stamp) * 9) * 22 : 0;
+    $('s5').style.transform = `translate(${Math.sin(t * 90) * shake}px, ${Math.cos(t * 70) * shake}px)`;
+  }
+  // ---------- S6 map
+  if (env($('s6'), t, SC[2] - 0.2, SC[3] + 0.05) > 0) {
+    popIn($('c6'), t, SC[2], 0.4); rise($('h6'), t, SC[2] + 0.2);
+    const m = outCubic(prog(t, SC[2] - 0.2, SC[2] + 0.7)); $('map').style.transform = `translateY(${(1 - m) * 200}px) scale(${0.9 + 0.1 * m})`;
+    popIn($('ctr'), t, C.map[0] - 0.3, 0.5);
+    const r = sine(prog(t, C.map[0], C.map[1]));
+    for (const id of ['rp', 'cas']) { const el = $(id); el.style.strokeDasharray = RL; el.style.strokeDashoffset = RL * (1 - r); }
+    const pt = RP.getPointAtLength(RL * r), pt2 = RP.getPointAtLength(Math.min(RL, RL * r + 1));
+    const ang = Math.atan2(pt2.y - pt.y, pt2.x - pt.x) * 180 / Math.PI;
+    $('plane').setAttribute('transform', `translate(${pt.x},${pt.y}) rotate(${ang}) scale(${1.2})`);
+    $('plane').style.opacity = r > 0 && r < 1 ? 1 : 0;
+    let shown = 0;
+    C.pins.forEach((a, i) => { const p = prog(t, a, a + 0.45); if (t >= a) shown++; S($('pin' + i), clamp(p * 5), `scale(${outBack(p)})`); });
+    $('ctrStops').textContent = shown; $('ctrNights').textContent = NIGHTS.slice(0, shown).reduce((x, y) => x + y, 0);
+    $('map').style.transform += ` scale(${1 + 0.04 * prog(t, C.map[0], SC[3])})`;
+  }
+  // ---------- S7 cards
+  if (env($('s7'), t, SC[3] - 0.2, SC[4] + 0.05) > 0) {
+    popIn($('c7'), t, SC[3], 0.4); rise($('h7'), t, SC[3] + 0.2);
+    const fly = (el, a, x, y, rot, fromX) => { const p = prog(t, a, a + 0.6); el.style.left = x + 'px'; el.style.top = y + 'px'; S(el, clamp(p * 4), `translateX(${(1 - outBack(p)) * fromX}px) rotate(${rot * outBack(p) + (1 - p) * fromX / 40}deg)`); };
+    fly($('k1'), C.cards[0], 60, 520, -5, -900); fly($('k2'), C.cards[1], 260, 870, 4, 900); fly($('k3'), C.cards[2], 110, 1230, -2, -900);
+    $('s7').style.transform = `scale(${1 + 0.03 * prog(t, SC[3], SC[4])})`;
+  }
+  // ---------- S8 getting around
+  if (env($('s8'), t, SC[4] - 0.2, SC[5] + 0.05) > 0) {
+    popIn($('c8'), t, SC[4], 0.4); rise($('h8'), t, SC[4] + 0.2);
+    const h = outCubic(prog(t, SC[4] - 0.1, SC[4] + 0.6)); S($('hero8'), h, `translateY(${(1 - h) * 120}px)`);
+    $('img8').style.transform = `scale(${1.14 - 0.1 * prog(t, SC[4], SC[5])})`;
+    const k = prog(t, C.tuk[0], C.tuk[1]);
+    const x = -260 + (1080 + 260 - 210 - 40) * sine(k);
+    const bounce = Math.abs(Math.sin(t * 22)) * 6;
+    $('tuk').style.left = x + 'px'; $('tuk').style.top = (-bounce) + 'px';
+    $('tukBody').setAttribute('transform', `rotate(${Math.sin(t * 22) * 1.5} 60 40)`);
+    C.opts.forEach((a, i) => popIn($('q' + (i + 1)), t, a, 0.6, 0.4));
+    $('q1').classList.toggle('on', t >= C.pick);
+    $('q1').style.transform += t >= C.pick && t < C.pick + 0.25 ? ' scale(0.97)' : '';
+  }
+  // ---------- S9 team
+  if (env($('s9'), t, SC[5] - 0.2, SC[6] + 0.05) > 0) {
+    popIn($('c9'), t, SC[5], 0.4); rise($('h9'), t, SC[5] + 0.2);
+    const l = outCubic(prog(t, SC[5] - 0.1, SC[5] + 0.7)); S($('laptop'), l, `translateY(${(1 - l) * 300}px) scale(${0.9 + 0.1 * l})`);
+    const s1 = $('st1');
+    if (t < C.status[0]) { s1.className = 'status new'; s1.textContent = 'New'; }
+    else if (t < C.status[1]) { s1.className = 'status rev'; s1.textContent = 'In review'; }
+    else { s1.className = 'status done'; s1.textContent = 'Completed'; }
+    const sp = (a) => (t >= a && t < a + 0.3 ? `scale(${1 + 0.25 * Math.sin(prog(t, a, a + 0.3) * Math.PI)})` : 'scale(1)');
+    s1.style.transform = t < C.status[1] ? sp(C.status[0]) : sp(C.status[1]);
+    const s2 = $('st2'); if (t >= C.notifs[1]) { s2.className = 'status done'; s2.textContent = 'Completed'; } else { s2.className = 'status new'; s2.textContent = 'New'; }
+    const n = (el, a) => { const p = prog(t, a, a + 0.55); S(el, clamp(p * 4), `translateY(${(1 - outBack(p)) * -220}px)`); };
+    n($('n1'), C.notifs[0]); n($('n2'), C.notifs[1]);
+  }
+  // ---------- S10 why now
+  if (env($('s10'), t, SC[6] - 0.15, SC[7] + 0.05) > 0) {
+    rise($('y1'), t, C.why[0]); popIn($('y2'), t, C.why[0] + 0.15, 0.4, 0.5);
+    $('yNum').textContent = Math.round(40 * outCubic(prog(t, C.why[0] + 0.15, C.why[1] + 0.5)));
+    rise($('y3'), t, C.why[1]); rise($('y4'), t, C.why[2]); popIn($('y5'), t, C.why[3], 1.4);
+    rise($('ysrc'), t, C.why[1], 0.5, 20);
+  }
+  // ---------- S11 end
+  if (env($('s11'), t, C.end - 0.05, 99, 0.05) > 0) {
+    const lp = prog(t, C.end, C.end + 0.9);
+    S($('endLogo'), clamp(lp * 4), `scale(${0.3 + 0.7 * outElastic(lp)})`);
+    const sp = outBack(prog(t, C.end + 0.35, C.end + 1.0)); $('endSpark').style.transform = `rotate(${(1 - sp) * -200 + 10}deg) scale(${sp})`;
+    rise($('endTag'), t, C.endText[0], 0.5, 40); popIn($('claim'), t, C.endText[1], 1.4);
+    const c = prog(t, C.endText[2], C.endText[2] + 0.5); S($('cta'), clamp(c * 3), `translateX(-50%) scale(${0.6 + 0.4 * outBack(c)})`);
+    drawConfetti(t);
+  }
+};
+window.DURATION = C.duration;
+window.renderAt(0);
+</script>
+</body>
+</html>
