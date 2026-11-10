@@ -464,7 +464,7 @@ tr.stale td.verified { color: var(--warn); font-weight: 700; }
 </header>
 
 <ol class="steps" aria-label="Try this">
-  <li>Sign up on the phone with any email</li>
+  <li>Tap Get started on the phone</li>
   <li>Ask for help with your visa or driving permit</li>
   <li>Plan your route on the map and book it</li>
   <li>Add things to do and choose a car</li>
@@ -777,6 +777,7 @@ tr.stale td.verified { color: var(--warn); font-weight: 700; }
     const now = Date.now(), h = 3600000;
     const rules = ['AU', 'AT', 'BH', 'BY', 'BE', 'CA', 'CN', 'CZ', 'DK', 'IN', 'ID', 'JP', 'MY', 'RU', 'TH'].map((code) => ({ code, fee: 0, maxStay: 30, source: SRC, verified: '2026-11-05' }));
     const tourists = [
+      { id: 't-demo', email: 'nimali@example.test', name: 'Nimali Perera', phone: '+447700900456', nat: 'IN', trip: { arrival: '2027-01-10', departure: '2027-01-24' }, licence: { has: true, issuedBy: 'IN', number: 'IN-0420190012345', expiry: '2030-01-01', idp: false } },
       { id: 't-anna', email: 'anna@example.test', name: 'Anna Demo', phone: '+61400000001', nat: 'AU', trip: { arrival: '2027-01-12', departure: '2027-02-02' }, licence: { has: true, issuedBy: 'AU', number: 'DEMO-123456', expiry: '2030-06-30', idp: true }, plan: { route: 'classic', stops: fitRoute(ROUTES[0], 21), acts: ['sig-climb', 'train', 'whales'] } },
       { id: 't-ben', email: 'ben@example.test', name: 'Ben Walker', phone: '+447700900123', nat: 'GB', trip: { arrival: '2027-02-03', departure: '2027-02-17' }, licence: { has: true, issuedBy: 'GB', number: 'WALKE801013B99XY', expiry: '2031-04-30', idp: false } },
       { id: 't-chen', email: 'chen@example.test', name: 'Chen Li', phone: '+8613800000001', nat: 'CN', trip: { arrival: '2027-03-01', departure: '2027-04-14' }, licence: { has: false }, plan: { route: 'culture', stops: fitRoute(ROUTES[1], 44), acts: [] } },
@@ -803,17 +804,17 @@ tr.stale td.verified { color: var(--warn); font-weight: 700; }
         events: [ev('submitted', null, now - 3 * h, null, 'tourist')] },
     ];
     return {
-      v: 4, rules, tourists, requests,
+      v: 5, rules, tourists, requests,
       phone: { me: null, screen: 'welcome', stack: [], draft: null, email: '', reqId: null, newType: null, files: {}, unread: false, replyKind: null, replyFile: null, confirmCancel: false, error: null, actFilter: 'route', actCat: 'all', car: null },
       portal: { screen: 'inbox', reqId: null, filter: 'open', type: '', role: 'agent', flash: null, editRule: null, attach: null },
       view: 'both',
     };
   }
 
-  const KEY = 'tourty-demo-v4';
+  const KEY = 'tourty-demo-v5';
   let S;
   try { S = JSON.parse(localStorage.getItem(KEY)); } catch (e) { S = null; }
-  if (!S || S.v !== 4) S = seed();
+  if (!S || S.v !== 5) S = seed();
   let saveTimer = null;
   function save() {
     clearTimeout(saveTimer);
@@ -887,9 +888,9 @@ tr.stale td.verified { color: var(--warn); font-weight: 700; }
           <h2>Your Sri Lanka holiday, sorted before you land.</h2>
           <p>Visa, driving permit, your route and a local team who handles the rest.</p></div>
         <div class="sheet" data-enter="2">
-          <div class="field"><label for="ph-email">Email</label><input id="ph-email" type="email" autocomplete="email" placeholder="you@example.com" value="${esc(p.email)}"></div>
-          <button type="button" class="btn" data-a="send-code" id="ph-send">Send me a code</button>
-          <p class="demo-note">Demo: <b>anna@example.test</b>, <b>ben@example.test</b> or <b>chen@example.test</b> open existing trips. Any other email signs up someone new.</p>
+          <button type="button" class="btn" data-a="start" id="ph-start">Get started</button>
+          <p class="demo-note">Or open another traveller's trip:</p>
+          <div class="chips">${[['t-anna', 'Anna · Australia'], ['t-ben', 'Ben · UK'], ['t-chen', 'Chen · China']].map(([id, label]) => `<button type="button" data-a="start" data-id="${id}">${label}</button>`).join('')}</div>
         </div></div>`;
       case 'code': return photoScreen(IMG.sigiriya, 0, `
         <h2 class="h-lg">Check your email</h2>
@@ -1193,7 +1194,7 @@ tr.stale td.verified { color: var(--warn); font-weight: 700; }
       const kinds = requiredFiles(p.newType, t.licence && t.licence.idp);
       const filesOk = kinds.every((k) => p.files[k]);
       const detailsOk = p.newType !== 'eta' || (p.draftReq.pp?.trim() && ISO.test(p.draftReq.ppexp || ''));
-      $('ph-submit').disabled = !(filesOk && detailsOk);
+      $('ph-submit').disabled = false; void filesOk; void detailsOk;
     }
   }
 
@@ -1271,8 +1272,8 @@ tr.stale td.verified { color: var(--warn); font-weight: 700; }
           <section class="p-card"><h3>Next step</h3>${moves.length ? `
             <label for="p-note">Note to the tourist<textarea id="p-note" placeholder="Shown to the tourist in the app"></textarea></label>
             ${moves.includes('completed') && ['eta', 'permit'].includes(r.type) ? `<div class="attach"><span>${r.type === 'eta' ? 'ETA approval' : 'Permit'}:</span>${pt.attach ? `<b class="flash" style="padding:4px 10px">${I.check}attached</b>` : ''}<label class="filebtn">Choose file<input type="file" accept="image/*" data-file="approval"></label><button type="button" class="p-btn sec" data-a="p-sample-attach" data-kind="${approvalKind}">Attach sample</button></div>` : ''}
-            <div class="p-actions">${moves.map((m) => `<button type="button" class="p-btn ${m === 'rejected' ? 'danger' : m === 'needs_info' ? 'sec' : ''}" data-a="p-move" data-to="${m}" ${NOTE_REQUIRED.includes(m) ? 'data-needs-note="1" disabled' : ''}>${T.action[m]}</button>`).join('')}</div>
-            <p class="muted" style="font-size:.84rem">Asking for info and rejecting need a note.</p>` : '<p class="muted">This request is closed.</p>'}</section>
+            <div class="p-actions">${moves.map((m) => `<button type="button" class="p-btn ${m === 'rejected' ? 'danger' : m === 'needs_info' ? 'sec' : ''}" data-a="p-move" data-to="${m}" >${T.action[m]}</button>`).join('')}</div>
+            <p class="muted" style="font-size:.84rem">Leave the note empty and we send a standard message.</p>` : '<p class="muted">This request is closed.</p>'}</section>
           <section class="p-card"><h3>Timeline</h3><ol class="timeline">${r.events.map((e) => `<li><b>${T.staffStatus[e.to]}</b><span class="when">${fmtTime(e.at)} · ${e.by === 'tourist' ? 'tourist' : 'staff'}</span>${e.note ? `<span class="note">${esc(e.note)}</span>` : ''}</li>`).join('')}</ol></section>
         </div>
       </div>`;
@@ -1302,7 +1303,7 @@ tr.stale td.verified { color: var(--warn); font-weight: 700; }
   function validatePortal() {
     const note = document.getElementById('p-note');
     if (!note) return;
-    document.querySelectorAll('[data-needs-note]').forEach((b) => { b.disabled = !note.value.trim(); });
+
   }
 
   // ------------------------------------------------------------------ render
@@ -1355,6 +1356,7 @@ tr.stale td.verified { color: var(--warn); font-weight: 700; }
 
   const actions = {
     back,
+    start(el) { const p = P(); p.me = el.dataset.id || 't-demo'; p.unread = false; notif = null; go('home', { replace: true }); },
     'send-code'() { const p = P(); p.email = document.getElementById('ph-email').value.trim().toLowerCase(); go('code'); },
     verify() {
       const p = P();
@@ -1411,6 +1413,12 @@ tr.stale td.verified { color: var(--warn); font-weight: 700; }
     sample(el) { const p = P(); p.files[el.dataset.kind] = sampleDoc(el.dataset.kind, me().name); renderAll(); },
     'submit-req'() {
       const p = P(), t = me(), type = p.newType;
+      p.draftReq = p.draftReq || {};
+      if (type === 'eta') {
+        if (!(p.draftReq.pp || '').trim()) p.draftReq.pp = 'N1234567';
+        if (!ISO.test(p.draftReq.ppexp || '')) p.draftReq.ppexp = '2031-01-01';
+      }
+      requiredFiles(type, t.licence && t.licence.idp).forEach((k) => { if (!p.files[k]) p.files[k] = sampleDoc(k, t.name); });
       if (openReq(t.id, type)) { p.error = 'You already have an open request of this type. Open it from the Requests tab.'; renderAll(); return; }
       if (type === 'eta' && cmp(p.draftReq.ppexp, t.trip.departure) < 0) { p.error = 'Your passport expires before you leave Sri Lanka. Renew it first, then apply.'; renderAll(); return; }
       const kinds = requiredFiles(type, t.licence && t.licence.idp);
@@ -1427,9 +1435,9 @@ tr.stale td.verified { color: var(--warn); font-weight: 700; }
     'send-reply'(el) {
       const p = P(), r = req(p.reqId);
       const note = (document.getElementById('ph-reply').value || '').trim();
-      if (!note && !p.replyFile) { p.error = 'Write a message or add a photo.'; renderAll(); return; }
+      if (!note && !p.replyFile && el.dataset.kind && el.dataset.kind !== 'undefined') p.replyFile = sampleDoc(el.dataset.kind, me().name);
       if (p.replyFile) r.docs.push({ kind: el.dataset.kind, url: p.replyFile });
-      changeStatus(r, 'in_review', 'tourist', note || 'New photo added.');
+      changeStatus(r, 'in_review', 'tourist', note || (p.replyFile ? 'New photo added.' : 'Here you go.'));
       p.replyFile = null; p.replyKind = null; renderAll();
     },
     cancel() { P().confirmCancel = true; renderAll(); },
@@ -1446,9 +1454,10 @@ tr.stale td.verified { color: var(--warn); font-weight: 700; }
     'p-move'(el) {
       const pt = S.portal, r = req(pt.reqId), to = el.dataset.to;
       const note = (document.getElementById('p-note').value || '').trim();
-      if (NOTE_REQUIRED.includes(to) && !note) return;
+      const STANDARD = { needs_info: 'Please send a clearer photo of your document.', rejected: 'We could not complete this request. Our team will contact you.' };
+      const finalNote = note || STANDARD[to] || '';
       if (to === 'completed' && pt.attach) r.docs.push({ kind: r.type === 'eta' ? 'eta_approval' : 'permit', url: pt.attach, by: 'staff' });
-      changeStatus(r, to, 'staff', note);
+      changeStatus(r, to, 'staff', finalNote);
       pt.attach = null;
       const name = tourist(r.touristId).name.split(' ')[0];
       flash(to === 'in_review' ? `Review started. ${name} got a notification.` : to === 'needs_info' ? `Sent to ${name}. Their phone shows the alert.` : to === 'completed' ? `Completed. ${name} got a notification.` : `Rejected. ${name} got a notification.`);
