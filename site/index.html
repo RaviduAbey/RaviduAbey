@@ -20,6 +20,11 @@
   <script>
     document.documentElement.classList.add('js');
     try { if (sessionStorage.getItem('ra-intro')) document.documentElement.classList.add('intro-seen'); } catch (e) {}
+    (function () {
+      var m = location.hash === '#apps' ? 'apps' : location.hash === '#analytics' ? 'analytics' : null;
+      if (!m) { try { m = localStorage.getItem('ra-mode'); } catch (e) {} }
+      document.documentElement.dataset.mode = m === 'apps' ? 'apps' : 'analytics';
+    })();
   </script>
   <script src="main.js" defer></script>
 </head>
@@ -48,6 +53,10 @@
 
   <header class="nav" data-nav>
     <a class="nav__logo" href="#top" aria-label="Ravidu Abeywardana, back to top">Ravidu<span>.</span></a>
+    <div class="mode mode--nav" role="group" aria-label="Choose which side of my work to see">
+          <button type="button" class="mode__btn" data-mode-set="analytics" aria-pressed="true">Analytics</button>
+          <button type="button" class="mode__btn" data-mode-set="apps" aria-pressed="false">Apps &amp; Websites</button>
+        </div>
     <nav aria-label="Main">
       <ul class="nav__links" id="nav-links">
         <li><a href="#about">About</a></li>
@@ -65,7 +74,7 @@
 
   <main id="main">
     <!-- HERO -->
-    <section class="hero" id="top" aria-labelledby="hero-title">
+    <section class="hero" id="top" aria-label="Introduction">
       <figure class="portrait" data-lens>
         <img class="portrait__img" src="assets/ravidu.jpg" srcset="assets/ravidu-sm.jpg 560w, assets/ravidu.jpg 1024w" sizes="(max-width: 900px) 100vw, 60vw" alt="Portrait of Ravidu Sadaruwan Abeywardana in a dark ceremonial coat against a red wall" width="1024" height="1536" fetchpriority="high" data-portrait>
         <div class="portrait__true" aria-hidden="true"></div>
@@ -77,15 +86,25 @@
       </figure>
 
       <div class="hero__copy">
-        <h1 id="hero-title" class="hero__title">
+        <h1 class="hero__title" data-side="analytics">
           <span class="ln"><span>Finding the</span></span>
           <span class="ln"><span><em>numbers</em> that</span></span>
           <span class="ln"><span>move a business.</span></span>
         </h1>
-        <p class="hero__lede"><strong>Ravidu Sadaruwan Abeywardana</strong>, business and data analyst in Melbourne. ERP, BI, marketing and AI automation, in one person.</p>
+        <h1 class="hero__title" data-side="apps">
+          <span class="ln"><span>Building the</span></span>
+          <span class="ln"><span><em>apps</em> that run</span></span>
+          <span class="ln"><span>on the numbers.</span></span>
+        </h1>
+        <p class="hero__lede" data-side="analytics"><strong>Ravidu Sadaruwan Abeywardana</strong>, business and data analyst in Melbourne. ERP, BI, marketing and AI automation, in one person.</p>
+        <p class="hero__lede" data-side="apps"><strong>Ravidu Sadaruwan Abeywardana</strong>, building websites, apps and AI tools in Melbourne: chatbots, automations and the dashboards behind them.</p>
+        <div class="mode mode--hero" role="group" aria-label="Choose which side of my work to see">
+          <button type="button" class="mode__btn" data-mode-set="analytics" aria-pressed="true">Analytics</button>
+          <button type="button" class="mode__btn" data-mode-set="apps" aria-pressed="false">Apps &amp; Websites</button>
+        </div>
         <div class="hero__actions">
           <a class="pill pill--cream" href="mailto:ravabe99@gmail.com?subject=Hello%20Ravidu">Email me<svg class="ico" aria-hidden="true"><use href="#i-arrow"/></svg></a>
-          <a class="pill pill--ghost" href="#work">See the work</a>
+          <a class="pill pill--ghost" href="#work" data-work-link>See the work</a>
         </div>
       </div>
 
@@ -96,7 +115,8 @@
     <!-- APPROACH: lights up as you read -->
     <section class="approach" aria-label="Approach">
       <div class="wrap">
-        <p class="approach__text" data-lit>From raw SAP exports to the slide the boardroom reads. I find where the <em>numbers</em> went, fix the systems that lost them, and build AI tools that keep them straight.</p>
+        <p class="approach__text" data-lit data-side="apps">Most internal tools fail because nobody opens them. I build small <em>apps</em> and websites around one job, wire in the data and the AI, and put them where people already work.</p>
+        <p class="approach__text" data-lit data-side="analytics">From raw SAP exports to the slide the boardroom reads. I find where the <em>numbers</em> went, fix the systems that lost them, and build AI tools that keep them straight.</p>
       </div>
     </section>
 
@@ -110,7 +130,7 @@
         </div>
       </div>
       <div class="wrap">
-        <dl class="facts" data-facts>
+        <dl class="facts" data-facts data-side="analytics">
           <div><dt>Stock discrepancies cut, Milwaukee / TTI</dt><dd><span data-count-to="2" data-prefix="$" data-suffix="M">$2M</span><small>→ $20K</small></dd></div>
           <div><dt>Savings from rework and recovery stock</dt><dd><span data-count-to="95" data-prefix="~$" data-suffix="K">~$95K</span></dd></div>
           <div><dt>SKUs of master data validated</dt><dd><span data-count-to="1000" data-suffix="+">1,000+</span></dd></div>
@@ -122,11 +142,11 @@
     <!-- SKILLS: a bar chart made of the skills themselves -->
     <section class="skills" id="skills" aria-labelledby="skills-title">
       <div class="wrap">
-        <div class="head">
+        <div class="head" data-side="analytics">
           <h2 id="skills-title" class="h2">What I bring to the <em>table</em>.</h2>
           <p>Thirty-two tools and methods, charted by where they live. Analytics leads; the other three are why the analysis gets used.</p>
         </div>
-        <div class="chart" data-chart>
+        <div class="chart" data-chart data-side="analytics">
           <div class="chart__col">
             <p class="chart__n">8</p>
             <ul class="chart__stack">
@@ -160,11 +180,41 @@
             <p>Workflows, chatbots and small apps that do the routine work.</p>
           </div>
         </div>
+      <div class="head" data-side="apps">
+          <h2 class="h2">What I build <em>with</em>.</h2>
+          <p>The tools behind my apps, automations and sites, charted by where they live. AI and automation lead.</p>
+        </div>
+        <div class="chart chart--3" data-chart data-side="apps">
+          <div class="chart__col">
+            <p class="chart__n">5</p>
+            <ul class="chart__stack">
+              <li class="hot">n8n workflows</li><li>Business chatbots</li><li>Power Automate</li><li>AI-assisted reporting</li><li>Apps built with AI</li>
+            </ul>
+            <h3>AI &amp; automation</h3>
+            <p>Workflows and chatbots that take the routine work off people.</p>
+          </div>
+          <div class="chart__col">
+            <p class="chart__n">5</p>
+            <ul class="chart__stack">
+              <li class="hot">Python</li><li>SQL</li><li>Java</li><li>C++</li><li>R</li>
+            </ul>
+            <h3>Code &amp; data</h3>
+            <p>The languages that connect an app to the data it runs on.</p>
+          </div>
+          <div class="chart__col">
+            <p class="chart__n">7</p>
+            <ul class="chart__stack">
+              <li class="hot">GEO · AEO</li><li>SEO</li><li>Entity mapping</li><li>Shopify</li><li>Etsy</li><li>Amazon</li><li>Pricing data</li>
+            </ul>
+            <h3>Web &amp; search</h3>
+            <p>Getting a site found, by search engines and by AI answers.</p>
+          </div>
+        </div>
       </div>
     </section>
 
     <!-- WORK: sideways case studies -->
-    <section class="work" id="work" aria-labelledby="work-title" data-hscroll>
+    <section class="work" id="work" aria-labelledby="work-title" data-hscroll data-side="analytics">
       <div class="work__sticky">
         <div class="wrap head head--work">
           <h2 id="work-title" class="h2">Selected <em>work</em>.</h2>
@@ -240,6 +290,47 @@
       </div>
     </section>
 
+    <!-- WORK: apps & websites -->
+    <section class="work work--apps" id="builds" aria-labelledby="builds-title" data-side="apps">
+      <div class="wrap head head--work">
+        <h2 id="builds-title" class="h2">Things I've <em>built</em>.</h2>
+      </div>
+      <ol class="work__track builds">
+        <li class="case">
+          <div class="case__vis vis-flow" aria-hidden="true">
+            <div class="flow"><span>Trigger</span><i></i><span>Transform</span><i></i><span>Report</span></div>
+          </div>
+          <div class="case__body">
+            <h3>Workflow automation</h3>
+            <p class="case__meta">n8n · Power Automate</p>
+            <p>Automations built in n8n and Power Automate that run routine steps and reporting without manual work.</p>
+            <ul class="tags"><li>n8n</li><li>Power Automate</li><li>AI-assisted reporting</li></ul>
+          </div>
+        </li>
+        <li class="case">
+          <div class="case__vis vis-chat" aria-hidden="true">
+            <p class="bub bub--in">Where is the SOP for blocked stock?</p>
+            <p class="bub bub--out">Here it is, with the steps for releasing it in EWM.</p>
+            <p class="vis__note">Illustrative exchange.</p>
+          </div>
+          <div class="case__body">
+            <h3>Internal business chatbots</h3>
+            <p class="case__meta">AI initiatives</p>
+            <p>Chatbots for internal teams, part of the AI initiatives behind continuous improvement work.</p>
+            <ul class="tags"><li>Chatbots</li><li>AI</li><li>Process knowledge</li></ul>
+          </div>
+        </li>
+        <li class="case case--cta">
+          <a class="cta-card" href="#contact">
+            <span class="cta-card__plus" aria-hidden="true"></span>
+            <span class="cta-card__title">Your app or website next</span>
+            <span class="cta-card__text">Tell me what it should do. I'll scope it, build it with AI and wire in the data.</span>
+            <span class="pill pill--cream pill--sm">Start a project<svg class="ico" aria-hidden="true"><use href="#i-arrow"/></svg></span>
+          </a>
+        </li>
+      </ol>
+    </section>
+
     <!-- EXPERIENCE -->
     <section class="exp" id="experience" aria-labelledby="exp-title">
       <div class="wrap">
@@ -277,7 +368,7 @@
     <!-- CONTACT -->
     <section class="contact" id="contact" aria-labelledby="contact-title">
       <div class="wrap">
-        <h2 id="contact-title" class="contact__title">Got a messy <em>dataset</em>? Let's talk.</h2>
+        <h2 id="contact-title" class="contact__title"><span data-side="analytics">Got a messy <em>dataset</em>? Let's talk.</span><span data-side="apps">Got an app <em>idea</em>? Let's build it.</span></h2>
         <div class="contact__row">
           <a class="contact__mail" href="mailto:ravabe99@gmail.com?subject=Hello%20Ravidu">ravabe99@gmail.com<svg class="ico" aria-hidden="true"><use href="#i-arrow"/></svg></a>
           <button class="pill pill--ghost pill--sm" type="button" data-copy="ravabe99@gmail.com"><svg class="ico" aria-hidden="true"><use href="#i-copy"/></svg><span data-copy-label>Copy email</span></button>

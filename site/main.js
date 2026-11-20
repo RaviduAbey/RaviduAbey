@@ -66,7 +66,11 @@
   const xy = $('[data-xy]');
   const tag = $('[data-tag]');
   const hint = $('.hero__hint');
-  const tools = ['Power BI', 'SQL', 'SAP EWM', 'Qlik', 'Python', 'Power Query', 'WAMAS', 'n8n', 'R', 'Oracle SIM', 'Advanced Excel', 'Power Automate'];
+  const toolSets = {
+    analytics: ['Power BI', 'SQL', 'SAP EWM', 'Qlik', 'Python', 'Power Query', 'WAMAS', 'R', 'Oracle SIM', 'Advanced Excel'],
+    apps: ['n8n', 'Chatbots', 'Python', 'Power Automate', 'SQL', 'Java', 'GEO', 'C++', 'AI-assisted reporting', 'AEO'],
+  };
+  const mode = () => (root.dataset.mode === 'apps' ? 'apps' : 'analytics');
   if (fig && img) {
     const setSrc = () => fig.style.setProperty('--src', `url("${img.currentSrc || img.src}")`);
     if (img.complete) setSrc(); else img.addEventListener('load', setSrc, { once: true });
@@ -92,7 +96,9 @@
       tx = px * 100; ty = py * 100; tr = RADIUS;
       travelled += Math.hypot(e.clientX - lastPX, e.clientY - lastPY);
       lastPX = e.clientX; lastPY = e.clientY;
+      const tools = toolSets[mode()];
       if (travelled > 70) { travelled = 0; toolIdx = (toolIdx + 1) % tools.length; }
+      toolIdx %= tools.length;
       xy.textContent = `x ${px.toFixed(2)} · y ${py.toFixed(2)}`;
       tag.textContent = `Detected: ${tools[toolIdx]}`;
       fig.classList.toggle('flip-x', px > 0.58);
@@ -112,9 +118,7 @@
   }
 
   /* ---------- 4. the approach line lights up as you read ---------- */
-  const lit = $('[data-lit]');
-  let words = [];
-  if (lit) {
+  const lits = $$('[data-lit]').map((el) => {
     const wrapWords = (node) => {
       [...node.childNodes].forEach((n) => {
         if (n.nodeType === 3) {
@@ -131,12 +135,20 @@
         } else if (n.nodeType === 1) wrapWords(n);
       });
     };
-    lit.setAttribute('aria-label', lit.textContent.replace(/\s+/g, ' ').trim());
-    wrapWords(lit);
-    words = $$('.w', lit);
-    words.forEach((w) => w.setAttribute('aria-hidden', 'true'));
+    const text = el.textContent.replace(/\s+/g, ' ').trim();
+    const holder = document.createElement('span');
+    holder.setAttribute('aria-hidden', 'true');
+    while (el.firstChild) holder.appendChild(el.firstChild);
+    el.appendChild(holder);
+    const sr = document.createElement('span');
+    sr.className = 'sr';
+    sr.textContent = text;
+    el.appendChild(sr);
+    wrapWords(holder);
+    const words = $$('.w', holder);
     if (reduce) words.forEach((w) => w.classList.add('is-lit'));
-  }
+    return { el, words };
+  });
 
   /* ---------- 5. count-ups ---------- */
   const fmt = (v, el) => {
@@ -158,15 +170,15 @@
   };
 
   /* ---------- 6. the skill chart: tools fall into bars ---------- */
-  const chart = $('[data-chart]');
-  if (chart) {
+  const charts = $$('[data-chart]');
+  charts.forEach((chart) => {
     $$('.chart__col', chart).forEach((col, c) => {
       $$('li', col).forEach((li, i) => {
         li.style.setProperty('--d', (c * 0.12 + i * 0.09).toFixed(2) + 's');
         li.style.setProperty('--rot', ((i % 2 ? 1 : -1) * (6 + ((i * 7 + c * 3) % 9))) + 'deg');
       });
     });
-  }
+  });
 
   /* ---------- case visuals: documents and people ---------- */
   const docs = $('[data-docs]');
@@ -186,16 +198,16 @@
     });
   }, { threshold: 0.3 });
   $$('[data-count-to]').forEach((el) => once.observe(el));
-  if (chart) once.observe(chart);
+  charts.forEach((c) => once.observe(c));
 
   /* ---------- 7. sideways work ---------- */
   const work = $('[data-hscroll]');
   const track = $('[data-hs-track]');
   const idx = $('[data-hs-index]');
-  const cases = $$('.case');
+  const cases = track ? $$('.case', track) : [];
   const wide = matchMedia('(min-width: 1024px)');
   let hsDist = 0;
-  const hsOn = () => wide.matches && !reduce;
+  const hsOn = () => wide.matches && !reduce && mode() === 'analytics';
   const layoutHS = () => {
     if (!work) return;
     if (hsOn()) {
@@ -230,12 +242,13 @@
     if (y < lastY - 4 || y < 240) nav.classList.remove('is-hidden');
     lastY = y;
 
-    if (words.length && !reduce) {
-      const b = lit.getBoundingClientRect();
+    if (!reduce) lits.forEach(({ el, words }) => {
+      const b = el.getBoundingClientRect();
+      if (!b.height) return;
       const p = clamp((vh * 0.82 - b.top) / (b.height + vh * 0.3));
       const n = Math.round(p * words.length);
       words.forEach((w, i) => w.classList.toggle('is-lit', i < n));
-    }
+    });
 
     if (work && hsOn()) {
       const b = work.getBoundingClientRect();
@@ -293,6 +306,40 @@
     }, { passive: true });
     document.addEventListener('pointerleave', () => cur.classList.remove('is-on'));
   } else if (cur) cur.remove();
+
+  /* ---------- 11. the two sides: Analytics / Apps & Websites ---------- */
+  const workLinks = [...$$('[data-work-link]'), ...$$('.nav__links a[href="#work"]')];
+  const hero = $('.hero');
+  const applyMode = (m) => {
+    root.dataset.mode = m;
+    $$('[data-mode-set]').forEach((btn) => btn.setAttribute('aria-pressed', String(btn.dataset.modeSet === m)));
+    workLinks.forEach((link) => link.setAttribute('href', m === 'apps' ? '#builds' : '#work'));
+    try { localStorage.setItem('ra-mode', m); } catch (e) {}
+    layoutHS();
+    if (!hsOn()) cases.forEach((c) => c.classList.add('is-in'));
+    onScroll();
+  };
+  const setMode = (m, fromHash) => {
+    if (m === mode()) return;
+    if (!fromHash) {
+      try { history.replaceState(null, '', m === 'apps' ? '#apps' : location.pathname + location.search); } catch (e) {}
+    }
+    if (reduce) { applyMode(m); return; }
+    root.classList.add('is-switching');
+    setTimeout(() => {
+      applyMode(m);
+      hero.classList.toggle('replay', false);
+      void hero.offsetWidth;
+      hero.classList.toggle('replay', true);
+      requestAnimationFrame(() => root.classList.toggle('is-switching', false));
+    }, 280);
+  };
+  $$('[data-mode-set]').forEach((btn) => btn.addEventListener('click', () => setMode(btn.dataset.modeSet)));
+  addEventListener('hashchange', () => {
+    if (location.hash === '#apps') setMode('apps', true);
+    else if (location.hash === '#analytics') setMode('analytics', true);
+  });
+  applyMode(mode());
 
   /* ---------- year ---------- */
   const yEl = $('[data-year]');
