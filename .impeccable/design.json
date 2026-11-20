@@ -1,0 +1,191 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-20T10:07:57Z",
+  "title": "Design System: Ravidu Abeywardana · Portfolio",
+  "extensions": {
+    "colorMeta": {
+      "bg": {
+        "role": "neutral",
+        "displayName": "Stage Black"
+      },
+      "cream": {
+        "role": "ink",
+        "displayName": "Cream"
+      },
+      "cream-2": {
+        "role": "ink",
+        "displayName": "Cream Body"
+      },
+      "mute": {
+        "role": "ink",
+        "displayName": "Data Grey"
+      },
+      "red": {
+        "role": "accent",
+        "displayName": "Signal Red"
+      },
+      "red-hot": {
+        "role": "accent",
+        "displayName": "Hot Red"
+      },
+      "red-deep": {
+        "role": "light",
+        "displayName": "Stage Light"
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Hero headline."
+      },
+      "headline": {
+        "displayName": "Section Headline",
+        "purpose": "h2s."
+      },
+      "accent": {
+        "displayName": "Italic Accent",
+        "purpose": "One word per heading."
+      },
+      "data": {
+        "displayName": "Data Mono",
+        "purpose": "Labels, readouts, tags, chart notes."
+      }
+    },
+    "shadows": [
+      {
+        "name": "dot-halo",
+        "value": "0 0 0 5px rgba(255,74,61,.16)",
+        "purpose": "Timeline dot once passed."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease",
+        "value": "cubic-bezier(.16,1,.3,1)",
+        "purpose": "All transitions."
+      },
+      {
+        "name": "intro-wipe",
+        "value": "clip-path 1s cubic-bezier(.76,0,.24,1)",
+        "purpose": "Intro leaves upward."
+      },
+      {
+        "name": "line-rise",
+        "value": "translateY(112%) to 0, 1.1s, 80ms stagger",
+        "purpose": "Hero headline lines."
+      },
+      {
+        "name": "lens-follow",
+        "value": "lerp 0.18 per frame",
+        "purpose": "Lens position and radius."
+      },
+      {
+        "name": "skill-drop",
+        "value": "drop 1s, stagger 90ms per pill, 120ms per column",
+        "purpose": "Skill chart build."
+      },
+      {
+        "name": "marquee",
+        "value": "22s / 40s linear infinite",
+        "purpose": "Intro and outro name."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "wide",
+        "value": "1024px"
+      },
+      {
+        "name": "two-up",
+        "value": "1080px"
+      },
+      {
+        "name": "stack",
+        "value": "900px"
+      },
+      {
+        "name": "phone",
+        "value": "560px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Pill",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Cream action pill.",
+      "html": "<a class=\"ds-pill\" href=\"#\">Email me</a>",
+      "css": ".ds-pill{display:inline-flex;align-items:center;min-height:52px;padding:0 1.55em;border-radius:999px;background:#f6efe9;color:#140b0c;font:600 .98rem Archivo,system-ui,sans-serif;text-decoration:none;transition:transform .25s cubic-bezier(.16,1,.3,1),background .25s}.ds-pill:hover{background:#fff;transform:translateY(-2px)}.ds-pill:focus-visible{outline:2px solid #ff4a3d;outline-offset:4px}"
+    },
+    {
+      "name": "Ghost Pill",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Secondary outline pill.",
+      "html": "<a class=\"ds-ghost\" href=\"#\">See the work</a>",
+      "css": ".ds-ghost{display:inline-flex;align-items:center;min-height:52px;padding:0 1.55em;border-radius:999px;border:1px solid rgba(246,239,233,.2);color:#f6efe9;font:600 .98rem Archivo,system-ui,sans-serif;text-decoration:none;transition:border-color .25s,background .25s}.ds-ghost:hover{border-color:#f6efe9;background:rgba(246,239,233,.06)}"
+    },
+    {
+      "name": "Skill Pill",
+      "kind": "chip",
+      "refersTo": "skill-pill",
+      "description": "A tool in the skill chart; the hot one is red.",
+      "html": "<span class=\"ds-skill\">Qlik</span> <span class=\"ds-skill hot\">Power BI</span>",
+      "css": ".ds-skill{display:inline-block;padding:.66em 1em;border-radius:999px;border:1px solid rgba(246,239,233,.2);background:rgba(246,239,233,.03);color:#f6efe9;font:600 .9rem Archivo,sans-serif}.ds-skill.hot{background:#e8161e;border-color:#e8161e;color:#fff}"
+    },
+    {
+      "name": "Case Card",
+      "kind": "card",
+      "refersTo": "case-card",
+      "description": "Case study with a data visual drawn from real figures.",
+      "html": "<article class=\"ds-case\"><div class=\"v\"><i></i></div><div class=\"b\"><span>01</span><h3>A $2M discrepancy, down to $20K</h3></div></article>",
+      "css": ".ds-case{width:340px;background:#130b0c;border:1px solid rgba(246,239,233,.1);border-radius:26px;overflow:hidden;color:#f6efe9;font-family:Archivo,sans-serif}.ds-case .v{height:140px;padding:40px 28px;background:radial-gradient(120% 120% at 100% 0%,rgba(110,2,5,.7),transparent 60%),#1c0f11}.ds-case .v i{display:block;height:24px;width:100%;border-radius:6px;background:#ff4a3d}.ds-case .b{padding:22px 26px}.ds-case span{font:700 1.4rem 'Bricolage Grotesque',sans-serif;color:#ff4a3d}.ds-case h3{margin:6px 0 0;font:700 1.5rem/1.1 'Bricolage Grotesque',sans-serif;letter-spacing:-.03em}"
+    },
+    {
+      "name": "Floating Nav",
+      "kind": "nav",
+      "refersTo": "nav",
+      "description": "Blurred pill nav with serif logo.",
+      "html": "<nav class=\"ds-nav\"><b>Ravidu<i>.</i></b><a href=\"#\">Work</a><a href=\"#\">Experience</a><a class=\"cta\" href=\"#\">Let's talk</a></nav>",
+      "css": ".ds-nav{display:flex;align-items:center;gap:18px;height:60px;padding:0 8px 0 22px;border-radius:999px;background:rgba(16,9,10,.72);border:1px solid rgba(246,239,233,.1);font:500 .9rem Archivo,sans-serif;color:#cfc5bf}.ds-nav b{font:italic 400 1.6rem 'Instrument Serif',serif;color:#f6efe9;margin-right:auto}.ds-nav b i{color:#e8161e}.ds-nav a{color:inherit;text-decoration:none}.ds-nav .cta{padding:10px 16px;border-radius:999px;background:#f6efe9;color:#140b0c;font-weight:600}"
+    }
+  ],
+  "narrative": {
+    "northStar": "Read through the analyst's lens",
+    "overview": "A dark, red-lit, portrait-led portfolio in the register of the reference Ravidu chose, with analytics-native signature moments: a cursor lens on the portrait, a skill chart built from the skills, case studies that draw their real figures.",
+    "keyCharacteristics": [
+      "Warm near-black stage with red light",
+      "Portrait in red duotone, true colour through the lens",
+      "One italic serif accent word per heading",
+      "Pills for every control",
+      "All figures from the CV"
+    ],
+    "rules": [
+      {
+        "name": "Red is light and data",
+        "body": "Red marks data and light; cream marks actions.",
+        "section": "colors"
+      },
+      {
+        "name": "One accent word",
+        "body": "Exactly one Instrument Serif italic word per heading.",
+        "section": "typography"
+      },
+      {
+        "name": "Depth by light",
+        "body": "Radial red washes and step-lighter surfaces; no drop shadows.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Say how every chart is scaled",
+      "Keep facts traceable to the CV"
+    ],
+    "donts": [
+      "No cards, suits or magic framing",
+      "No eyebrows above headings",
+      "No invented testimonials or projects"
+    ]
+  }
+}

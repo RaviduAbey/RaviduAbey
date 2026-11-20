@@ -1,0 +1,5 @@
+# Cloudflare Pages project for Rav Abe's portfolio.
+# Deploy:  npx wrangler pages deploy
+name = "ravabe99"
+pages_build_output_dir = "./site"
+compatibility_date = "2026-11-01"
