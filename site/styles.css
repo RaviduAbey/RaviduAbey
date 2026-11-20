@@ -672,3 +672,15 @@ html.is-switching main { opacity: 0; filter: blur(6px); }
 .hero.replay .ln:nth-child(2) > span { animation-delay: .07s; }
 .hero.replay .ln:nth-child(3) > span { animation-delay: .14s; }
 @keyframes line-rise { from { transform: translateY(112%); } to { transform: none; } }
+
+/* ---------- particle portrait ---------- */
+.portrait__particles { position: absolute; inset: 0; z-index: 2; touch-action: pan-y; }
+.portrait.has-particles .portrait__img { visibility: hidden; }
+.portrait.has-particles::after,
+.portrait.has-particles::before,
+.portrait.has-particles .portrait__true,
+.portrait.has-particles .portrait__grid { display: none; }
+.portrait.has-particles .lens-readout { transform: translate(26px, 26px); }
+.portrait.has-particles.flip-x .lens-readout { transform: translate(calc(-100% - 26px), 26px); }
+.portrait.has-particles.flip-y .lens-readout { transform: translate(26px, calc(-100% - 26px)); }
+.portrait.has-particles.flip-x.flip-y .lens-readout { transform: translate(calc(-100% - 26px), calc(-100% - 26px)); }
