@@ -41,7 +41,23 @@ cd site && python3 -m http.server 8080
 
 (Opening `index.html` straight from disk works, but browsers block the self-hosted fonts over `file://`.)
 
-## Deploy to Cloudflare Pages (project `ravabe99`)
+## Live
+
+**https://ravabe99.pages.dev** (Cloudflare Pages project `ravabe99`, account dreamingravi, production branch `main`).
+
+### Redeploy from a Claude Code cloud session
+
+In cloud sessions the network proxy swaps in the saved Cloudflare token on every request, which breaks wrangler's asset upload. Instead, pack the site into one Pages `_worker.js` and post it with the token:
+
+```bash
+python3 scripts/build_pages_worker.py site build/_worker.js
+curl -X POST "https://api.cloudflare.com/client/v4/accounts/<ACCOUNT_ID>/pages/projects/ravabe99/deployments" \
+  -H "Authorization: Bearer proxy-injected" \
+  --form-string 'manifest={}' --form-string 'branch=main' \
+  -F "_worker.js=@build/_worker.js;type=application/javascript+module"
+```
+
+## Deploy to Cloudflare Pages from your own machine
 
 **Option A: connect the GitHub repo (auto-deploys on every push)**
 
