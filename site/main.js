@@ -60,61 +60,14 @@
   addEventListener('keydown', (e) => { if (e.key === 'Escape') setMenu(false); });
   nav.addEventListener('focusin', () => nav.classList.remove('is-hidden'));
 
-  /* ---------- 3. the analyst lens ---------- */
-  const fig = $('[data-lens]');
-  const img = $('[data-portrait]');
-  const xy = $('[data-xy]');
-  const tag = $('[data-tag]');
-  const hint = $('.hero__hint');
-  const toolSets = {
-    analytics: ['Power BI', 'SQL', 'SAP EWM', 'Qlik', 'Python', 'Power Query', 'WAMAS', 'R', 'Oracle SIM', 'Advanced Excel'],
-    apps: ['n8n', 'Chatbots', 'Python', 'Power Automate', 'SQL', 'Java', 'GEO', 'C++', 'AI-assisted reporting', 'AEO'],
-  };
+  /* ---------- 3. portrait: the particles react to the pointer (particles.js) ---------- */
   const mode = () => (root.dataset.mode === 'apps' ? 'apps' : 'analytics');
-  if (fig && img) {
-    const setSrc = () => fig.style.setProperty('--src', `url("${img.currentSrc || img.src}")`);
-    if (img.complete) setSrc(); else img.addEventListener('load', setSrc, { once: true });
-
-    const RADIUS = fine ? 118 : 96;
-    let tx = 58, ty = 26, x = 58, y = 26, tr = 0, r = 0, raf = 0, travelled = 0, lastPX = 0, lastPY = 0, toolIdx = 0, hideT = 0;
-
-    const loop = () => {
-      const k = reduce ? 1 : 0.18;
-      x += (tx - x) * k; y += (ty - y) * k; r += (tr - r) * (reduce ? 1 : 0.16);
-      fig.style.setProperty('--lx', x.toFixed(2) + '%');
-      fig.style.setProperty('--ly', y.toFixed(2) + '%');
-      fig.style.setProperty('--r', r.toFixed(1) + 'px');
-      if (Math.abs(tx - x) > 0.05 || Math.abs(ty - y) > 0.05 || Math.abs(tr - r) > 0.3) raf = requestAnimationFrame(loop);
-      else raf = 0;
-    };
-    const kick = () => { if (!raf) raf = requestAnimationFrame(loop); };
-
-    const aim = (e) => {
-      const b = fig.getBoundingClientRect();
-      const px = clamp((e.clientX - b.left) / b.width);
-      const py = clamp((e.clientY - b.top) / b.height);
-      tx = px * 100; ty = py * 100; tr = RADIUS;
-      travelled += Math.hypot(e.clientX - lastPX, e.clientY - lastPY);
-      lastPX = e.clientX; lastPY = e.clientY;
-      const tools = toolSets[mode()];
-      if (travelled > 70) { travelled = 0; toolIdx = (toolIdx + 1) % tools.length; }
-      toolIdx %= tools.length;
-      xy.textContent = `x ${px.toFixed(2)} · y ${py.toFixed(2)}`;
-      tag.textContent = `Detected: ${tools[toolIdx]}`;
-      fig.classList.toggle('flip-x', px > 0.58);
-      fig.classList.toggle('flip-y', py > 0.72);
-      fig.classList.add('is-on');
-      if (hint) hint.classList.add('is-gone');
-      kick();
-    };
-    const release = () => { tr = 0; fig.classList.remove('is-on'); kick(); };
-
-    fig.addEventListener('pointermove', aim);
-    fig.addEventListener('pointerdown', (e) => { clearTimeout(hideT); aim(e); });
-    fig.addEventListener('pointerleave', (e) => { if (e.pointerType === 'mouse') release(); });
-    fig.addEventListener('pointerup', (e) => {
-      if (e.pointerType !== 'mouse') { clearTimeout(hideT); hideT = setTimeout(release, 1600); }
-    });
+  const fig = $('[data-lens]');
+  const hint = $('.hero__hint');
+  if (fig && hint) {
+    const hideHint = () => hint.classList.add('is-gone');
+    fig.addEventListener('pointermove', hideHint, { once: true });
+    fig.addEventListener('pointerdown', hideHint, { once: true });
   }
 
   /* ---------- 4. the approach line lights up as you read ---------- */

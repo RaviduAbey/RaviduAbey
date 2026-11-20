@@ -94,7 +94,7 @@
       }
     }
     for (let b = 1; b <= BUCKETS; b++) starts[b] += starts[b - 1];
-    mouse.r = Math.max(70, Math.min(140, W * 0.13));
+    mouse.r = Math.max(64, Math.min(120, W * 0.11));
     return true;
   }
 
@@ -119,9 +119,9 @@
       if (mouse.on) {
         const dx = x[i] - mouse.x, dy = y[i] - mouse.y, d2 = dx * dx + dy * dy;
         if (d2 < R2 && d2 > 0.01) {
-          const d = Math.sqrt(d2), f = (1 - d / R) * (1 - d / R) * 7.5;
-          ax += (dx / d) * f - (dy / d) * f * 0.35;
-          ay += (dy / d) * f + (dx / d) * f * 0.35;
+          const d = Math.sqrt(d2), f = (1 - d / R) * (1 - d / R) * 4.2;
+          ax += (dx / d) * f - (dy / d) * f * 0.18;
+          ay += (dy / d) * f + (dx / d) * f * 0.18;
         }
       }
       vx[i] = (vx[i] + ax) * 0.84;

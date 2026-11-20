@@ -190,48 +190,6 @@ html:not(.js) .intro, .intro-seen .intro { display: none; }
   mix-blend-mode: multiply;
   pointer-events: none;
 }
-.portrait__true, .portrait__grid {
-  position: absolute; inset: 0; z-index: 2;
-  clip-path: circle(var(--r) at var(--lx) var(--ly));
-  pointer-events: none;
-}
-.portrait__true {
-  background-image: var(--src, none);
-  background-size: cover; background-position: 50% 12%;
-  transform: scale(1.04);
-}
-.portrait__grid {
-  z-index: 3;
-  background:
-    linear-gradient(rgba(246, 239, 233, .16) 1px, transparent 1px) 0 0 / 28px 28px,
-    linear-gradient(90deg, rgba(246, 239, 233, .16) 1px, transparent 1px) 0 0 / 28px 28px;
-}
-.portrait::before {
-  content: ""; position: absolute; z-index: 4;
-  left: var(--lx); top: var(--ly);
-  width: calc(var(--r) * 2); height: calc(var(--r) * 2);
-  transform: translate(-50%, -50%);
-  border: 1px solid rgba(246, 239, 233, .75);
-  border-radius: 50%;
-  pointer-events: none;
-}
-.lens-readout {
-  position: absolute; z-index: 5;
-  left: var(--lx); top: var(--ly);
-  transform: translate(calc(var(--r) * .72), calc(var(--r) * .72));
-  display: grid; gap: 2px;
-  padding: 8px 12px; border-radius: 10px;
-  background: rgba(10, 6, 7, .8); border: 1px solid var(--line-2);
-  font-family: var(--f-mono); font-size: .75rem; line-height: 1.4; color: var(--cream-2);
-  white-space: nowrap;
-  opacity: 0; transition: opacity .3s;
-  pointer-events: none;
-}
-.lens-readout b { color: var(--red-hot); font-weight: 600; }
-.portrait.is-on .lens-readout { opacity: 1; }
-.portrait.flip-x .lens-readout { transform: translate(calc(-100% - var(--r) * .72), calc(var(--r) * .72)); }
-.portrait.flip-y .lens-readout { transform: translate(calc(var(--r) * .72), calc(-100% - var(--r) * .72)); }
-.portrait.flip-x.flip-y .lens-readout { transform: translate(calc(-100% - var(--r) * .72), calc(-100% - var(--r) * .72)); }
 
 .hero__copy {
   position: relative; z-index: 2;
@@ -571,7 +529,7 @@ html:not(.js) .timeline::after { transform: none; }
   .chart__n { font-size: 1.9rem; }
   .chart__col h3 { font-size: 1.1rem; }
   .chart__col > p:last-child { min-height: 7.6em; font-size: .86rem; }
-  .portrait__img, .portrait__true { object-position: 50% 0; background-position: 50% 0; }
+  .portrait__img { object-position: 50% 0; }
   .facts { grid-template-columns: 1fr; }
   .facts > div + div { border-left: 0; padding-left: 0; border-top: 1px solid var(--line); }
   .facts > div:nth-child(n+2) { padding-top: 26px; }
@@ -676,11 +634,4 @@ html.is-switching main { opacity: 0; filter: blur(6px); }
 /* ---------- particle portrait ---------- */
 .portrait__particles { position: absolute; inset: 0; z-index: 2; touch-action: pan-y; }
 .portrait.has-particles .portrait__img { visibility: hidden; }
-.portrait.has-particles::after,
-.portrait.has-particles::before,
-.portrait.has-particles .portrait__true,
-.portrait.has-particles .portrait__grid { display: none; }
-.portrait.has-particles .lens-readout { transform: translate(26px, 26px); }
-.portrait.has-particles.flip-x .lens-readout { transform: translate(calc(-100% - 26px), 26px); }
-.portrait.has-particles.flip-y .lens-readout { transform: translate(26px, calc(-100% - 26px)); }
-.portrait.has-particles.flip-x.flip-y .lens-readout { transform: translate(calc(-100% - 26px), calc(-100% - 26px)); }
+.portrait.has-particles::after { display: none; }
