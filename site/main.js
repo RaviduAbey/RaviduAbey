@@ -294,6 +294,75 @@
   });
   applyMode(mode());
 
+  /* ---------- 12. scroll motion ---------- */
+  // thin reading-progress line along the top edge
+  const bar = document.createElement('div');
+  bar.className = 'progress';
+  bar.setAttribute('aria-hidden', 'true');
+  document.body.appendChild(bar);
+
+  // headings rise in word by word as they arrive
+  const heads = reduce ? [] : $$('.h2, .contact__title > span');
+  heads.forEach((head) => {
+    let k = 0;
+    const wrap = (node) => {
+      const box = document.createElement('span');
+      box.className = 'rw';
+      const inner = document.createElement('span');
+      inner.className = 'rw__in';
+      inner.style.setProperty('--i', k++);
+      box.appendChild(inner);
+      return [box, inner];
+    };
+    [...head.childNodes].forEach((n) => {
+      if (n.nodeType === 3) {
+        const frag = document.createDocumentFragment();
+        n.textContent.split(/(\s+)/).forEach((part) => {
+          if (!part) return;
+          if (/^\s+$/.test(part)) { frag.appendChild(document.createTextNode(part)); return; }
+          const [box, inner] = wrap();
+          inner.textContent = part;
+          frag.appendChild(box);
+        });
+        n.replaceWith(frag);
+      } else if (n.nodeType === 1) {
+        const [box, inner] = wrap();
+        n.replaceWith(box);
+        inner.appendChild(n);
+      }
+    });
+    head.classList.add('rw-ready');
+  });
+  const headIO = new IntersectionObserver((entries) => {
+    entries.forEach((en) => { if (en.isIntersecting) { en.target.classList.add('is-in'); headIO.unobserve(en.target); } });
+  }, { threshold: 0.15, rootMargin: '0px 0px -8% 0px' });
+  heads.forEach((hd) => headIO.observe(hd));
+
+  // on phones and tablets the case studies stack like cards
+  const narrow = matchMedia('(max-width: 1023px)');
+  const stacks = [$$('#work .case'), $$('#builds .case')];
+  stacks.forEach((list) => list.forEach((c, i) => c.style.setProperty('--k', i)));
+  const stackOn = () => narrow.matches && !reduce;
+  const scrollFx = () => {
+    const max = document.documentElement.scrollHeight - innerHeight;
+    bar.style.transform = `scaleX(${max > 0 ? clamp(scrollY / max) : 0})`;
+    stacks.forEach((list) => list.forEach((c, i) => {
+      const next = list[i + 1];
+      if (!stackOn() || !next) { c.style.removeProperty('transform'); c.style.removeProperty('filter'); return; }
+      const ct = c.getBoundingClientRect();
+      if (!ct.height) return;
+      const nt = next.getBoundingClientRect();
+      const p = clamp(1 - (nt.top - ct.top) / ct.height);
+      c.style.transform = p > 0 ? `scale(${(1 - 0.06 * p).toFixed(4)})` : '';
+      c.style.filter = p > 0 ? `brightness(${(1 - 0.5 * p).toFixed(3)})` : '';
+    }));
+  };
+  let fxTick = false;
+  addEventListener('scroll', () => { if (!fxTick) { fxTick = true; requestAnimationFrame(() => { fxTick = false; scrollFx(); }); } }, { passive: true });
+  addEventListener('resize', scrollFx);
+  narrow.addEventListener('change', scrollFx);
+  scrollFx();
+
   /* ---------- year ---------- */
   const yEl = $('[data-year]');
   if (yEl) yEl.textContent = String(new Date().getFullYear());

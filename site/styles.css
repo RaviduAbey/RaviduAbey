@@ -635,3 +635,33 @@ html.is-switching main { opacity: 0; filter: blur(6px); }
 .portrait__particles { position: absolute; inset: 0; z-index: 2; touch-action: pan-y; }
 .portrait.has-particles .portrait__img { visibility: hidden; }
 .portrait.has-particles::after { display: none; }
+
+/* ============================================================
+   scroll motion (phone-first)
+   ============================================================ */
+.progress {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 150;
+  height: 2px; background: var(--red-hot);
+  transform-origin: 0 50%; transform: scaleX(0);
+  pointer-events: none;
+}
+
+/* headings rise in, word by word */
+.rw { display: inline-block; overflow: clip; vertical-align: top; padding-bottom: .1em; margin-bottom: -.1em; }
+.rw__in { display: inline-block; }
+.rw-ready .rw__in { transform: translateY(108%); transition: transform .95s var(--ease); transition-delay: calc(var(--i, 0) * 55ms); }
+.rw-ready.is-in .rw__in { transform: none; }
+.contact__title > span { display: inline; }
+
+/* case studies stack like cards on phones and tablets */
+@media (max-width: 1023px) and (prefers-reduced-motion: no-preference) {
+  .work__track, .builds { display: flex; flex-direction: column; gap: 22px; }
+  .work__track .case {
+    position: sticky;
+    top: calc(84px + var(--k, 0) * 10px);
+    transform-origin: 50% 0;
+    transition: border-color .3s;
+    box-shadow: 0 -18px 40px -24px rgba(0, 0, 0, .9);
+  }
+  .work__track .case:hover { transform: none; }
+}

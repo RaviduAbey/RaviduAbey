@@ -29,7 +29,8 @@
   });
 
   let W = 0, H = 0, dpr = 1, n = 0, size = 3;
-  let x, y, hx, hy, vx, vy, delay, sz, starts = [];
+  let x, y, hx, hy, vx, vy, delay, sz, sdx, sdy, starts = [];
+  let scrollP = 0;
   let raf = 0, t0 = 0, built = false;
   const mouse = { x: -9999, y: -9999, on: false, r: 120 };
 
@@ -78,11 +79,17 @@
     hx = new Float32Array(n); hy = new Float32Array(n);
     vx = new Float32Array(n); vy = new Float32Array(n);
     delay = new Float32Array(n); sz = new Float32Array(n);
+    sdx = new Float32Array(n); sdy = new Float32Array(n);
     starts = new Array(BUCKETS + 1).fill(0);
     for (let i = 0; i < n; i++) {
       const p = pts[i];
       hx[i] = p[0]; hy[i] = p[1];
       sz[i] = size * (0.45 + p[3] * 0.6);
+      // where this particle drifts as the hero scrolls away: up and outward
+      const sa = -Math.PI / 2 + (Math.random() - 0.5) * Math.PI * 1.3;
+      const sm = (0.25 + Math.random() * 0.85) * H * 0.55;
+      sdx[i] = Math.cos(sa) * sm + (hx[i] - W * 0.6) * 0.35;
+      sdy[i] = Math.sin(sa) * sm;
       starts[p[2] + 1]++;
       if (reduce || built) { x[i] = hx[i]; y[i] = hy[i]; }
       else {
@@ -101,6 +108,7 @@
   function draw() {
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, W, H);
+    ctx.globalAlpha = 1 - scrollP * 0.75;
     for (let b = 0; b < BUCKETS; b++) {
       const a = starts[b], e = starts[b + 1];
       if (a === e) continue;
@@ -115,7 +123,8 @@
     const R = mouse.r, R2 = R * R;
     for (let i = 0; i < n; i++) {
       const k = t > delay[i] ? 0.055 : 0.0025;
-      let ax = (hx[i] - x[i]) * k, ay = (hy[i] - y[i]) * k;
+      const tx = hx[i] + sdx[i] * scrollP, ty = hy[i] + sdy[i] * scrollP;
+      let ax = (tx - x[i]) * k, ay = (ty - y[i]) * k;
       if (mouse.on) {
         const dx = x[i] - mouse.x, dy = y[i] - mouse.y, d2 = dx * dx + dy * dy;
         if (d2 < R2 && d2 > 0.01) {
@@ -127,7 +136,7 @@
       vx[i] = (vx[i] + ax) * 0.84;
       vy[i] = (vy[i] + ay) * 0.84;
       x[i] += vx[i]; y[i] += vy[i];
-      if (!moving && (Math.abs(vx[i]) > 0.03 || Math.abs(vy[i]) > 0.03 || Math.abs(hx[i] - x[i]) > 0.4 || Math.abs(hy[i] - y[i]) > 0.4)) moving = true;
+      if (!moving && (Math.abs(vx[i]) > 0.03 || Math.abs(vy[i]) > 0.03 || Math.abs(tx - x[i]) > 0.4 || Math.abs(ty - y[i]) > 0.4)) moving = true;
     }
     draw();
     if (moving || mouse.on || t < 1.4) raf = requestAnimationFrame(tick);
@@ -164,6 +173,23 @@
   fig.addEventListener('pointerleave', () => { mouse.on = false; wake(); });
   fig.addEventListener('pointerup', (e) => { if (e.pointerType !== 'mouse') { mouse.on = false; wake(); } });
   fig.addEventListener('pointercancel', () => { mouse.on = false; wake(); });
+
+  // scrolling past the hero dissolves the portrait; scrolling back rebuilds it
+  if (!reduce) {
+    let st = false;
+    addEventListener('scroll', () => {
+      if (st) return;
+      st = true;
+      requestAnimationFrame(() => {
+        st = false;
+        if (!built) return;
+        const r = fig.getBoundingClientRect();
+        const raw = Math.min(1, Math.max(0, -r.top / (r.height * 0.75)));
+        const eased = raw * raw * (3 - 2 * raw);
+        if (Math.abs(eased - scrollP) > 0.002) { scrollP = eased; wake(); }
+      });
+    }, { passive: true });
+  }
 
   // rebuild on resize, keeping the settled portrait
   let rt = 0, lastW = 0;
