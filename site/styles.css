@@ -486,7 +486,7 @@ html:not(.js) .timeline::after { transform: none; }
 @media (max-width: 900px) {
   .nav { padding-left: 18px; }
   .nav nav { margin-left: 0; }
-  .nav__cta { margin-left: auto; }
+  .nav__mail { margin-left: auto; }
   .nav__menu { display: block; }
   .nav__links {
     position: absolute; left: 0; right: 0; top: calc(100% + 8px);
@@ -530,8 +530,6 @@ html:not(.js) .timeline::after { transform: none; }
   .case__vis { padding-inline: 22px; }
   .sku-grid { --c: 6px; }
   .vis__note { left: 22px; }
-  .nav__cta { display: none; }
-  .nav__menu { margin-left: auto; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -732,3 +730,14 @@ html.is-switching main { opacity: 0; filter: blur(6px); }
   .brand--full img { padding: 0; }
 }
 @media (prefers-reduced-motion: reduce) { .brand__card, .brand__card[aria-pressed="true"] { transition: none; } }
+
+/* ---------- email icon in the bar ---------- */
+.nav__mail {
+  display: grid; place-items: center; flex: none;
+  width: 44px; height: 44px; border-radius: 50%;
+  background: var(--cream); color: #140b0c;
+  transition: transform .25s var(--ease), background-color .25s, color .25s;
+}
+.nav__mail .ico { width: 20px; height: 20px; }
+.nav__mail:hover { background: var(--red); color: #fff; transform: translateY(-1px) rotate(-6deg); }
+.nav__mail:active { transform: scale(.94); }
