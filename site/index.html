@@ -61,6 +61,7 @@
     <nav aria-label="Main">
       <ul class="nav__links" id="nav-links">
         <li><a href="#about">About</a></li>
+        <li><a href="#brands">Brands</a></li>
         <li><a href="#skills">Skills</a></li>
         <li><a href="#work">Work</a></li>
         <li><a href="#experience">Experience</a></li>
@@ -131,6 +132,92 @@
           <div><dt>SKUs of master data validated</dt><dd><span data-count-to="1000" data-suffix="+">1,000+</span></dd></div>
           <div><dt>Master of Business Analytics GPA</dt><dd><span data-count-to="6.94" data-decimals="2">6.94</span><small>/ 7</small></dd></div>
         </dl>
+      </div>
+    </section>
+
+    <!-- BRANDS: tap a card to see what I did. To add one: drop the logo in
+         assets/brands/ and copy a <li class="brand"> block. Filter tags:
+         employer, web, app, data, mkt. -->
+    <section class="brands" id="brands" aria-labelledby="brands-title">
+      <div class="wrap">
+        <div class="head">
+          <h2 id="brands-title" class="h2">Brands I've <em>worked with</em>.</h2>
+          <p>Employers and clients, from a global tool maker to local businesses. Tap a card to see what I did.</p>
+        </div>
+        <div class="brand-filter" role="group" aria-label="Filter brands">
+          <button type="button" data-filter="all" aria-pressed="true">All</button>
+          <button type="button" data-filter="web app" aria-pressed="false">Websites &amp; apps</button>
+          <button type="button" data-filter="data" aria-pressed="false">Analytics</button>
+          <button type="button" data-filter="employer" aria-pressed="false">Employers</button>
+        </div>
+        <ul class="brand-grid">
+          <li class="brand" data-tags="employer data">
+            <button class="brand__card" type="button" aria-pressed="false">
+              <span class="brand__face brand__front brand--contain brand--full" style="--tile:#cc2030"><img src="assets/brands/milwaukee.jpg" alt="Milwaukee Tool logo" loading="lazy" decoding="async"><span class="brand__glare" aria-hidden="true"></span></span>
+              <span class="brand__face brand__back">
+                <span class="brand__name">Milwaukee Tool</span>
+                <span class="brand__tags"><i>Employer</i><i>Analytics</i></span>
+                <span class="brand__text">Inventory Leading Hand (Investigations Analyst) at the DV01 distribution centre in Victoria. Cut stock discrepancies from $2M to $20K.</span>
+                <span class="brand__when">2025–26</span>
+              </span>
+            </button>
+          </li>
+          <li class="brand" data-tags="employer data">
+            <button class="brand__card" type="button" aria-pressed="false">
+              <span class="brand__face brand__front brand--contain" style="--tile:#0055a5"><img src="assets/brands/the-good-guys.png" alt="The Good Guys logo" loading="lazy" decoding="async"><span class="brand__glare" aria-hidden="true"></span></span>
+              <span class="brand__face brand__back">
+                <span class="brand__name">The Good Guys</span>
+                <span class="brand__tags"><i>Employer</i><i>Analytics</i></span>
+                <span class="brand__text">Operations Team Member in Maribyrnong. Sales, stock and fulfilment analysis in Oracle SIM, Power BI and Excel.</span>
+                <span class="brand__when">2023–25</span>
+              </span>
+            </button>
+          </li>
+          <li class="brand" data-tags="web app data">
+            <button class="brand__card" type="button" aria-pressed="false">
+              <span class="brand__face brand__front brand--cover" style="--tile:#1f0103"><img src="assets/brands/matara-express-cabs.jpg" alt="Matara Express Cabs logo" loading="lazy" decoding="async"><span class="brand__glare" aria-hidden="true"></span></span>
+              <span class="brand__face brand__back">
+                <span class="brand__name">Matara Express Cabs</span>
+                <span class="brand__tags"><i>Website</i><i>App</i><i>Analytics</i></span>
+                <span class="brand__text">Built their website and app, plus the analytics and reporting behind them.</span>
+                
+              </span>
+            </button>
+          </li>
+          <li class="brand" data-tags="app mkt data">
+            <button class="brand__card" type="button" aria-pressed="false">
+              <span class="brand__face brand__front brand--contain" style="--tile:#ffffff"><span class="brand__word">A & Jay<small>Car & Truck Rentals</small></span><span class="brand__glare" aria-hidden="true"></span></span>
+              <span class="brand__face brand__back">
+                <span class="brand__name">A & Jay Car & Truck Rentals</span>
+                <span class="brand__tags"><i>App</i><i>Marketing & SEO</i><i>Analytics</i></span>
+                <span class="brand__text">Built their app and handled marketing, SEO, analytics and reporting.</span>
+                
+              </span>
+            </button>
+          </li>
+          <li class="brand" data-tags="web">
+            <button class="brand__card" type="button" aria-pressed="false">
+              <span class="brand__face brand__front brand--contain" style="--tile:#ffffff"><img src="assets/brands/inlined.png" alt="inlined. logo" loading="lazy" decoding="async"><span class="brand__glare" aria-hidden="true"></span></span>
+              <span class="brand__face brand__back">
+                <span class="brand__name">inlined.</span>
+                <span class="brand__tags"><i>Website</i></span>
+                <span class="brand__text">Built their website.</span>
+                
+              </span>
+            </button>
+          </li>
+          <li class="brand" data-tags="web">
+            <button class="brand__card" type="button" aria-pressed="false">
+              <span class="brand__face brand__front brand--contain" style="--tile:#f7f7f4"><img src="assets/brands/dr-asanka-gunawardana.png" alt="Dr. Asanka Gunawardana logo" loading="lazy" decoding="async"><span class="brand__glare" aria-hidden="true"></span></span>
+              <span class="brand__face brand__back">
+                <span class="brand__name">Dr. Asanka Gunawardana</span>
+                <span class="brand__tags"><i>Website</i></span>
+                <span class="brand__text">Built his website.</span>
+                
+              </span>
+            </button>
+          </li>
+        </ul>
       </div>
     </section>
 

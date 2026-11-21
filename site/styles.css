@@ -665,3 +665,76 @@ html.is-switching main { opacity: 0; filter: blur(6px); }
   }
   .work__track .case:hover { transform: none; }
 }
+
+/* ============================================================
+   brands I've worked with
+   ============================================================ */
+.brands { padding-block: clamp(90px, 12vw, 160px); }
+.brand-filter { display: flex; flex-wrap: wrap; gap: 8px; margin: -24px 0 32px; }
+.brand-filter button {
+  min-height: 44px; padding: 0 1.1em; border-radius: 999px;
+  border: 1px solid var(--line-2); color: var(--cream-2);
+  font-weight: 600; font-size: .88rem;
+  transition: background-color .25s, color .25s, border-color .25s;
+}
+.brand-filter button:hover { border-color: var(--cream); color: var(--cream); }
+.brand-filter button[aria-pressed="true"] { background: var(--cream); border-color: var(--cream); color: #140b0c; }
+
+.brand-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(14px, 2vw, 24px); }
+.brand[hidden] { display: none; }
+.brand.pop { animation: brand-pop .5s var(--ease) both; }
+.brand__card {
+  --rx: 0deg; --ry: 0deg; --flip: 0deg;
+  position: relative; display: grid; width: 100%;
+  aspect-ratio: 4 / 3.4;
+  border-radius: 22px;
+  transform-style: preserve-3d;
+  transform: perspective(1100px) rotateX(var(--rx)) rotateY(calc(var(--ry) + var(--flip)));
+  transition: transform .7s var(--ease);
+  text-align: left;
+}
+.brand__card:hover { transition: transform .25s ease-out; }
+.brand__card[aria-pressed="true"] { --flip: 180deg; transition: transform .7s var(--ease); }
+.brand__face {
+  grid-area: 1 / 1; position: relative; overflow: hidden;
+  border-radius: inherit; border: 1px solid var(--line);
+  backface-visibility: hidden; -webkit-backface-visibility: hidden;
+}
+.brand__front { display: grid; place-items: center; background: var(--tile); }
+.brand__front img { position: absolute; inset: 0; width: 100%; height: 100%; }
+.brand--cover img { object-fit: cover; }
+.brand--contain img { object-fit: contain; padding: 14% 16%; }
+.brand--full img { padding: 0; }
+.brand--cover img { object-position: 50% 72%; }
+.brand__word { display: grid; justify-items: center; gap: 4px; font-family: var(--f-display); font-weight: 800; font-size: clamp(1.8rem, 3.4vw, 2.8rem); letter-spacing: -.04em; line-height: 1; color: #1a5fd0; text-align: center; padding: 0 12%; }
+.brand__word small { font-size: .42em; font-weight: 700; letter-spacing: -.01em; color: #2b2a6b; }
+.brand__glare {
+  position: absolute; inset: 0; pointer-events: none; opacity: 0;
+  background: radial-gradient(60% 60% at var(--gx, 50%) var(--gy, 50%), rgba(255, 255, 255, .28), transparent 60%);
+  transition: opacity .3s;
+}
+.brand__card:hover .brand__glare { opacity: 1; }
+.brand__back {
+  display: flex; flex-direction: column; gap: 10px;
+  padding: clamp(18px, 2.2vw, 26px);
+  background: radial-gradient(90% 80% at 100% 0%, rgba(110, 2, 5, .65), transparent 65%), var(--bg-3);
+  transform: rotateY(180deg);
+}
+.brand__name { font-family: var(--f-display); font-weight: 700; font-size: clamp(1.2rem, 1.8vw, 1.5rem); letter-spacing: -.03em; line-height: 1.1; color: var(--cream); }
+.brand__tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.brand__tags i { font-style: normal; font-family: var(--f-mono); font-size: .7rem; padding: .35em .7em; border-radius: 999px; border: 1px solid rgba(255, 74, 61, .5); color: var(--red-hot); }
+.brand__text { font-size: .92rem; line-height: 1.45; color: var(--cream-2); }
+.brand__when { margin-top: auto; font-family: var(--f-mono); font-size: .75rem; color: var(--mute); }
+.brand__card:focus-visible { outline: 2px solid var(--red-hot); outline-offset: 4px; }
+
+@keyframes brand-pop { from { opacity: 0; transform: translateY(12px) scale(.97); } to { opacity: 1; transform: none; } }
+
+@media (max-width: 900px) { .brand-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 560px) {
+  .brand-filter { margin-top: -16px; }
+  .brand-grid { grid-template-columns: 1fr; gap: 14px; }
+  .brand__card { aspect-ratio: 16 / 10; }
+  .brand--contain img { padding: 10% 18%; }
+  .brand--full img { padding: 0; }
+}
+@media (prefers-reduced-motion: reduce) { .brand__card, .brand__card[aria-pressed="true"] { transition: none; } }

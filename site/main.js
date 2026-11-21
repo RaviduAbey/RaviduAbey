@@ -363,6 +363,40 @@
   narrow.addEventListener('change', scrollFx);
   scrollFx();
 
+  /* ---------- 13. brand cards: flip, tilt, filter ---------- */
+  const brandCards = $$('.brand__card');
+  brandCards.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const on = btn.getAttribute('aria-pressed') !== 'true';
+      btn.setAttribute('aria-pressed', String(on));
+    });
+    if (fine && !reduce) {
+      btn.addEventListener('pointermove', (e) => {
+        const r = btn.getBoundingClientRect();
+        const px = (e.clientX - r.left) / r.width, py = (e.clientY - r.top) / r.height;
+        btn.style.setProperty('--ry', ((px - 0.5) * 14).toFixed(2) + 'deg');
+        btn.style.setProperty('--rx', ((0.5 - py) * 12).toFixed(2) + 'deg');
+        btn.style.setProperty('--gx', (px * 100).toFixed(1) + '%');
+        btn.style.setProperty('--gy', (py * 100).toFixed(1) + '%');
+      });
+      btn.addEventListener('pointerleave', () => {
+        btn.style.setProperty('--rx', '0deg');
+        btn.style.setProperty('--ry', '0deg');
+      });
+    }
+  });
+  const filterBtns = $$('[data-filter]');
+  filterBtns.forEach((fb) => fb.addEventListener('click', () => {
+    const want = fb.dataset.filter.split(' ');
+    filterBtns.forEach((o) => o.setAttribute('aria-pressed', String(o === fb)));
+    $$('.brand').forEach((li) => {
+      const tags = li.dataset.tags.split(' ');
+      const show = want[0] === 'all' || want.some((t) => tags.includes(t));
+      li.hidden = !show;
+      if (show) { li.classList.remove('pop'); void li.offsetWidth; li.classList.add('pop'); }
+    });
+  }));
+
   /* ---------- year ---------- */
   const yEl = $('[data-year]');
   if (yEl) yEl.textContent = String(new Date().getFullYear());

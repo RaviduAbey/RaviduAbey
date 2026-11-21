@@ -77,6 +77,14 @@ npx wrangler pages deploy        # reads wrangler.toml, uploads ./site
 1. Pages project → Custom domains → Set up a domain.
 2. Update the domain in `site/index.html`: the `canonical`, `og:url` and `og:image` tags currently point at `ravabe99.pages.dev`.
 
+## Adding a brand card
+
+1. Put the logo in `site/assets/brands/` (PNG or JPG, about 500px wide is plenty).
+2. In `site/index.html`, find the `BRANDS` comment and copy one `<li class="brand">` block.
+3. Change the logo path, `alt` text, `--tile` colour (match the logo's background), name, text and years.
+4. Set `data-tags` for the filters: `employer`, `web`, `app`, `data` (Analytics), `mkt` (Marketing & SEO).
+5. Use `brand--contain` for logos on a plain background, `brand--cover` for photos.
+
 ## Editing content
 
 All text lives in `site/index.html`. To swap the portrait, replace `site/assets/ravidu.jpg` (portrait, about 2:3) and `ravidu-sm.jpg` (560px wide), then regenerate `share.png`.
