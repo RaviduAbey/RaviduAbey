@@ -30,6 +30,7 @@ TYPES = {
     ".png": "image/png",
     ".json": "application/json",
     ".txt": "text/plain; charset=utf-8",
+    ".vcf": "text/vcard; charset=utf-8",
 }
 
 src = pathlib.Path(sys.argv[1])
@@ -78,6 +79,7 @@ export default {
     if (!FILES[p]) { p = '/404.html'; status = 404; }
     const headers = new Headers(SECURITY);
     headers.set('content-type', FILES[p][0]);
+    if (p.startsWith('/card/')) headers.set('x-robots-tag', 'noindex, nofollow');
     headers.set('cache-control',
       status !== 200 ? 'no-store'
       : p.startsWith('/fonts/') ? 'public, max-age=31536000, immutable'

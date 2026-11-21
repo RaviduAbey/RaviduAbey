@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Rav Abeywardana · Card</title>
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="description" content="Rav Abeywardana's contact card: call, email, Instagram, Facebook, and save the contact.">
+  <meta name="theme-color" content="#0a0607">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <meta property="og:title" content="Rav Abeywardana">
+  <meta property="og:description" content="Business & Data Analyst · Apps & Websites · Melbourne">
+  <meta property="og:image" content="https://ravabe99.pages.dev/share.png">
+  <link rel="preload" href="/fonts/bricolage-grotesque-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <style>
+    @font-face { font-family: "Bricolage Grotesque"; font-weight: 200 800; font-display: swap; src: url("/fonts/bricolage-grotesque-latin.woff2") format("woff2"); }
+    @font-face { font-family: "Instrument Serif"; font-style: italic; font-weight: 400; font-display: swap; src: url("/fonts/instrument-serif-400-italic-latin.woff2") format("woff2"); }
+    @font-face { font-family: "Archivo"; font-weight: 100 900; font-display: swap; src: url("/fonts/archivo-latin.woff2") format("woff2"); }
+    @font-face { font-family: "Martian Mono"; font-weight: 100 800; font-display: swap; src: url("/fonts/martian-mono-latin.woff2") format("woff2"); }
+
+    :root {
+      --bg: #0a0607; --bg-2: #130b0c; --bg-3: #1c0f11;
+      --line: rgba(246, 239, 233, .1); --line-2: rgba(246, 239, 233, .2);
+      --cream: #f6efe9; --cream-2: #cfc5bf; --mute: #958a85;
+      --red: #e8161e; --red-hot: #ff4a3d; --red-deep: #6e0205;
+      --ease: cubic-bezier(.16, 1, .3, 1);
+      color-scheme: dark;
+    }
+    * { box-sizing: border-box; }
+    html { background: var(--bg); -webkit-text-size-adjust: 100%; }
+    body {
+      margin: 0; min-height: 100svh;
+      background:
+        radial-gradient(80% 50% at 50% 0%, rgba(110, 2, 5, .55), transparent 70%),
+        radial-gradient(70% 40% at 50% 100%, rgba(110, 2, 5, .35), transparent 70%),
+        var(--bg);
+      color: var(--cream); font-family: "Archivo", system-ui, sans-serif; line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: inherit; text-decoration: none; }
+    button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+    :focus-visible { outline: 2px solid var(--red-hot); outline-offset: 3px; border-radius: 10px; }
+    .ico { width: 22px; height: 22px; flex: none; }
+
+    main {
+      width: min(440px, 100%); margin: 0 auto;
+      padding: max(28px, env(safe-area-inset-top)) max(18px, env(safe-area-inset-right)) max(36px, env(safe-area-inset-bottom)) max(18px, env(safe-area-inset-left));
+      display: grid; gap: 22px;
+    }
+
+    /* ---------- the card ---------- */
+    .stage { perspective: 1200px; }
+    .card {
+      --rx: 0deg; --ry: 0deg; --flip: 0deg;
+      position: relative; display: grid; width: 100%; aspect-ratio: 5 / 6.2;
+      border-radius: 26px; transform-style: preserve-3d;
+      transform: rotateX(var(--rx)) rotateY(calc(var(--ry) + var(--flip)));
+      transition: transform .8s var(--ease);
+      animation: card-in 1s var(--ease) backwards;
+    }
+    .card.is-flipped { --flip: 180deg; }
+    .card.is-tilting { transition: transform .12s linear; }
+    .face {
+      grid-area: 1 / 1; position: relative; overflow: hidden; border-radius: inherit;
+      border: 1px solid var(--line-2);
+      backface-visibility: hidden; -webkit-backface-visibility: hidden;
+      box-shadow: 0 30px 60px -30px rgba(0, 0, 0, .9);
+    }
+    .front { background: var(--bg-3); }
+    .front img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 8%; }
+    .front::after {
+      content: ""; position: absolute; inset: 0;
+      background: linear-gradient(180deg, transparent 35%, rgba(10, 6, 7, .55) 58%, rgba(10, 6, 7, .96) 88%);
+    }
+    .shine {
+      position: absolute; inset: 0; z-index: 2; pointer-events: none;
+      background: linear-gradient(115deg, transparent 30%, rgba(255, 255, 255, .12) 48%, transparent 62%);
+      background-size: 250% 250%; background-position: var(--sx, 50%) 50%;
+    }
+    .front__mark { position: absolute; top: 18px; left: 20px; z-index: 3; font-family: "Instrument Serif", serif; font-style: italic; font-size: 1.7rem; line-height: 1; }
+    .front__mark span { color: var(--red); }
+    .front__flip {
+      position: absolute; top: 14px; right: 14px; z-index: 3;
+      display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 16px;
+      border-radius: 999px; background: rgba(10, 6, 7, .78); border: 1px solid var(--line-2);
+      font-size: .82rem; font-weight: 600;
+    }
+    .front__body { position: absolute; left: 22px; right: 22px; bottom: 22px; z-index: 3; display: grid; gap: 6px; }
+    .front__name { margin: 0; font-family: "Bricolage Grotesque", sans-serif; font-weight: 700; font-size: clamp(2rem, 9vw, 2.6rem); line-height: .95; letter-spacing: -.04em; }
+    .front__name em { font-family: "Instrument Serif", serif; font-weight: 400; color: var(--red-hot); letter-spacing: -.01em; }
+    .front__role { margin: 0; color: var(--cream-2); font-size: .98rem; }
+    .front__where { margin: 4px 0 0; font-family: "Martian Mono", monospace; font-size: .72rem; color: var(--mute); }
+
+    .back {
+      transform: rotateY(180deg);
+      display: grid; align-content: center; justify-items: center; gap: 16px; padding: 26px;
+      background: radial-gradient(90% 70% at 50% 0%, rgba(110, 2, 5, .6), transparent 70%), var(--bg-3);
+      text-align: center;
+    }
+    .back__qr { width: min(72%, 260px); aspect-ratio: 1; padding: 12px; border-radius: 20px; background: #fff; }
+    .back__qr img { width: 100%; height: 100%; display: block; }
+    .back__title { margin: 0; font-family: "Bricolage Grotesque", sans-serif; font-weight: 700; font-size: 1.35rem; letter-spacing: -.03em; }
+    .back__url { margin: -8px 0 0; font-family: "Martian Mono", monospace; font-size: .74rem; color: var(--mute); }
+    .back__row { display: flex; gap: 10px; }
+
+    /* ---------- actions ---------- */
+    .primary { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      min-height: 54px; padding: 0 16px; border-radius: 999px;
+      font-weight: 600; font-size: 1rem;
+      transition: transform .2s var(--ease), background-color .2s, border-color .2s;
+    }
+    .btn:active { transform: scale(.97); }
+    .btn--cream { background: var(--cream); color: #140b0c; }
+    .btn--ghost { border: 1px solid var(--line-2); }
+    .btn--sm { min-height: 44px; font-size: .88rem; padding: 0 14px; }
+    .btn--wide { grid-column: 1 / -1; }
+
+    .links { list-style: none; margin: 0; padding: 0; border-radius: 22px; overflow: hidden; border: 1px solid var(--line); background: var(--bg-2); }
+    .links li + li { border-top: 1px solid var(--line); }
+    .links a {
+      display: grid; grid-template-columns: 44px 1fr auto; align-items: center; gap: 12px;
+      min-height: 68px; padding: 10px 16px;
+      transition: background-color .2s;
+    }
+    .links a:active, .links a:hover { background: rgba(246, 239, 233, .05); }
+    .links .tile { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 14px; background: rgba(255, 74, 61, .12); color: var(--red-hot); }
+    .links b { display: block; font-weight: 600; font-size: 1rem; }
+    .links small { display: block; color: var(--mute); font-size: .86rem; overflow-wrap: anywhere; }
+    .links .go { width: 18px; height: 18px; color: var(--mute); }
+
+    .foot { text-align: center; color: var(--mute); font-size: .84rem; }
+    .foot a { display: inline-block; padding: 12px 4px; color: var(--cream-2); text-decoration: underline; text-underline-offset: 3px; }
+    .toast {
+      position: fixed; left: 50%; bottom: max(24px, env(safe-area-inset-bottom)); transform: translate(-50%, 160%);
+      visibility: hidden;
+      padding: 12px 18px; border-radius: 999px; background: var(--cream); color: #140b0c; font-weight: 600; font-size: .92rem;
+      transition: transform .35s var(--ease); z-index: 10;
+    }
+    .toast.is-on { transform: translate(-50%, 0); visibility: visible; }
+    .toast { transition: transform .35s var(--ease), visibility .35s; }
+
+    @keyframes card-in { from { opacity: 0; transform: translateY(24px) rotateX(14deg) scale(.96); } to { opacity: 1; } }
+    @media (prefers-reduced-motion: reduce) { .card, .card.is-flipped { transition: none; animation: none; } }
+  </style>
+</head>
+<body>
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="i-phone" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></symbol>
+    <symbol id="i-mail" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="m3.5 7 8.5 6 8.5-6"/></g></symbol>
+    <symbol id="i-ig" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/></g><circle cx="17.3" cy="6.7" r="1.3" fill="currentColor"/></symbol>
+    <symbol id="i-fb" viewBox="0 0 24 24"><path fill="currentColor" d="M13.5 21v-7.2h2.4l.4-2.9h-2.8V9.1c0-.8.3-1.4 1.4-1.4h1.5V5.1c-.3 0-1.1-.1-2.1-.1-2.1 0-3.6 1.3-3.6 3.7v2.2H8.3v2.9h2.4V21z"/></symbol>
+    <symbol id="i-in" viewBox="0 0 24 24"><path fill="currentColor" d="M5.2 8.6h3V19h-3zM6.7 4a1.7 1.7 0 1 1 0 3.5 1.7 1.7 0 0 1 0-3.5M10.1 8.6H13V10c.4-.8 1.5-1.7 3.1-1.7 3.3 0 3.9 2.2 3.9 5V19h-3v-5c0-1.2 0-2.7-1.7-2.7s-1.9 1.3-1.9 2.6V19h-3z"/></symbol>
+    <symbol id="i-web" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.7 5.6 3.7 9s-1.2 6.4-3.7 9c-2.5-2.6-3.7-5.6-3.7-9S9.5 5.6 12 3"/></g></symbol>
+    <symbol id="i-go" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="m9 6 6 6-6 6"/></symbol>
+    <symbol id="i-qr" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><path d="M14 14h2v2M20 14v6h-4M14 18v2"/></g></symbol>
+    <symbol id="i-save" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="8" r="4"/><path d="M3 20c0-3.6 3.1-6 7-6s7 2.4 7 6M19 8v6M16 11h6"/></g></symbol>
+    <symbol id="i-share" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v13M7 8l5-5 5 5"/><path d="M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></g></symbol>
+  </svg>
+
+  <main>
+    <div class="stage">
+      <div class="card" data-card>
+        <section class="face front" aria-label="Contact card">
+          <img src="/assets/ravidu-sm.jpg" alt="Portrait of Rav Abeywardana" width="560" height="840">
+          <span class="shine" aria-hidden="true"></span>
+          <p class="front__mark" aria-hidden="true">Rav<span>.</span></p>
+          <button class="front__flip" type="button" data-flip aria-label="Show my QR code"><svg class="ico" style="width:18px;height:18px" aria-hidden="true"><use href="#i-qr"/></svg>QR</button>
+          <div class="front__body">
+            <h1 class="front__name">Ravidu <em>Abeywardana</em></h1>
+            <p class="front__role">Business &amp; Data Analyst · Apps &amp; Websites</p>
+            <p class="front__where">Melbourne, Victoria</p>
+          </div>
+        </section>
+        <section class="face back" aria-label="QR code for this card">
+          <div class="back__qr"><img src="qr.svg" alt="QR code linking to ravabe99.pages.dev/card"></div>
+          <p class="back__title">Scan to save my details</p>
+          <p class="back__url">ravabe99.pages.dev/card</p>
+          <div class="back__row">
+            <a class="btn btn--ghost btn--sm" href="rav-qr.png" download="Rav-Abeywardana-QR.png">Save QR image</a>
+            <button class="btn btn--ghost btn--sm" type="button" data-flip>Back to card</button>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <div class="primary">
+      <a class="btn btn--cream btn--wide" href="rav-abeywardana.vcf" download="Rav-Abeywardana.vcf"><svg class="ico" aria-hidden="true"><use href="#i-save"/></svg>Save contact</a>
+      <a class="btn btn--ghost" href="tel:+61431968148"><svg class="ico" aria-hidden="true"><use href="#i-phone"/></svg>Call</a>
+      <button class="btn btn--ghost" type="button" data-share><svg class="ico" aria-hidden="true"><use href="#i-share"/></svg>Share</button>
+    </div>
+
+    <ul class="links">
+      <li><a href="tel:+61431968148"><span class="tile"><svg class="ico" aria-hidden="true"><use href="#i-phone"/></svg></span><span><b>Mobile</b><small>+61 431 968 148</small></span><svg class="go" aria-hidden="true"><use href="#i-go"/></svg></a></li>
+      <li><a href="mailto:ravabe99@gmail.com?subject=Hello%20Rav"><span class="tile"><svg class="ico" aria-hidden="true"><use href="#i-mail"/></svg></span><span><b>Email</b><small>ravabe99@gmail.com</small></span><svg class="go" aria-hidden="true"><use href="#i-go"/></svg></a></li>
+      <li><a href="https://www.instagram.com/ravi.abeywardana/" target="_blank" rel="noopener"><span class="tile"><svg class="ico" aria-hidden="true"><use href="#i-ig"/></svg></span><span><b>Instagram</b><small>@ravi.abeywardana</small></span><svg class="go" aria-hidden="true"><use href="#i-go"/></svg></a></li>
+      <li><a href="https://www.facebook.com/ravidusadaruwan.abeywardana" target="_blank" rel="noopener"><span class="tile"><svg class="ico" aria-hidden="true"><use href="#i-fb"/></svg></span><span><b>Facebook</b><small>Ravidu Sadaruwan Abeywardana</small></span><svg class="go" aria-hidden="true"><use href="#i-go"/></svg></a></li>
+      <li><a href="https://www.linkedin.com/in/raviduabey" target="_blank" rel="noopener"><span class="tile"><svg class="ico" aria-hidden="true"><use href="#i-in"/></svg></span><span><b>LinkedIn</b><small>in/raviduabey</small></span><svg class="go" aria-hidden="true"><use href="#i-go"/></svg></a></li>
+      <li><a href="/"><span class="tile"><svg class="ico" aria-hidden="true"><use href="#i-web"/></svg></span><span><b>Portfolio</b><small>ravabe99.pages.dev</small></span><svg class="go" aria-hidden="true"><use href="#i-go"/></svg></a></li>
+    </ul>
+
+    <p class="foot">Tap the card to flip it. <a href="/">See my work</a></p>
+  </main>
+  <div class="toast" role="status" aria-live="polite" data-toast></div>
+
+  <script>
+  (() => {
+    const card = document.querySelector('[data-card]');
+    const toast = document.querySelector('[data-toast]');
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const say = (msg) => { toast.textContent = msg; toast.classList.add('is-on'); clearTimeout(say.t); say.t = setTimeout(() => toast.classList.remove('is-on'), 2200); };
+
+    // flip: the QR button, the back button, or a tap anywhere on the card face
+    const flip = () => {
+      const on = !card.classList.contains('is-flipped');
+      card.classList.toggle('is-flipped', on);
+      document.querySelector('.front__flip').setAttribute('aria-label', on ? 'Show my card' : 'Show my QR code');
+    };
+    document.querySelectorAll('[data-flip]').forEach((b) => b.addEventListener('click', (e) => { e.stopPropagation(); flip(); }));
+    card.addEventListener('click', (e) => { if (!e.target.closest('a, button')) flip(); });
+
+    // tilt: follows the pointer on a computer and the phone's angle on Android
+    if (!reduce) {
+      const tilt = (x, y) => {
+        card.classList.add('is-tilting');
+        card.style.setProperty('--ry', (x * 12).toFixed(2) + 'deg');
+        card.style.setProperty('--rx', (-y * 10).toFixed(2) + 'deg');
+        card.style.setProperty('--sx', (50 + x * 60).toFixed(1) + '%');
+      };
+      const rest = () => { card.classList.remove('is-tilting'); card.style.setProperty('--rx', '0deg'); card.style.setProperty('--ry', '0deg'); };
+      card.addEventListener('pointermove', (e) => {
+        if (e.pointerType !== 'mouse') return;
+        const r = card.getBoundingClientRect();
+        tilt((e.clientX - r.left) / r.width - .5, (e.clientY - r.top) / r.height - .5);
+      });
+      card.addEventListener('pointerleave', rest);
+      let base = null;
+      addEventListener('deviceorientation', (e) => {
+        if (e.beta == null || e.gamma == null) return;
+        if (!base) base = { b: e.beta, g: e.gamma };
+        const x = Math.max(-1, Math.min(1, (e.gamma - base.g) / 25));
+        const y = Math.max(-1, Math.min(1, (e.beta - base.b) / 25));
+        tilt(x * .8, y * .8);
+      });
+    }
+
+    // share this card
+    document.querySelector('[data-share]').addEventListener('click', async () => {
+      const data = { title: 'Rav Abeywardana', text: 'Business & Data Analyst · Apps & Websites', url: location.origin + '/card' };
+      if (navigator.share) { try { await navigator.share(data); } catch (e) {} return; }
+      try { await navigator.clipboard.writeText(data.url); say('Link copied'); } catch (e) { say(data.url); }
+    });
+  })();
+  </script>
+</body>
+</html>
