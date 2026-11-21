@@ -179,17 +179,9 @@ html:not(.js) .intro, .intro-seen .intro { display: none; }
 .portrait__img {
   position: absolute; inset: 0; width: 100%; height: 100%;
   object-fit: cover; object-position: 50% 12%;
-  filter: grayscale(1) contrast(1.2) brightness(.82);
-  transform: scale(1.04);
 }
 .js .portrait__img { opacity: 0; }
 .is-ready .portrait__img { animation: portrait-in 1.8s var(--ease) both; }
-.portrait::after {
-  content: ""; position: absolute; inset: 0; z-index: 1;
-  background: linear-gradient(180deg, #d0141c, #7a0308);
-  mix-blend-mode: multiply;
-  pointer-events: none;
-}
 
 .hero__copy {
   position: relative; z-index: 2;
@@ -472,7 +464,7 @@ html:not(.js) .timeline::after { transform: none; }
    ============================================================ */
 @keyframes marquee { to { transform: translateX(-50%); } }
 @keyframes blink { 50% { opacity: 0; } }
-@keyframes portrait-in { from { transform: scale(1.14); opacity: 0; } to { transform: scale(1.04); opacity: 1; } }
+@keyframes portrait-in { from { transform: scale(1.08); opacity: 0; } to { transform: none; opacity: 1; } }
 @keyframes drop {
   0% { opacity: 0; transform: translateY(-46vh) rotate(var(--rot, 0deg)); }
   12% { opacity: 1; }
@@ -632,9 +624,8 @@ html.is-switching main { opacity: 0; filter: blur(6px); }
 @keyframes line-rise { from { transform: translateY(112%); } to { transform: none; } }
 
 /* ---------- particle portrait ---------- */
-.portrait__particles { position: absolute; inset: 0; z-index: 2; touch-action: pan-y; }
+.portrait__particles { position: absolute; inset: 0; z-index: 2; touch-action: pan-y; image-rendering: pixelated; }
 .portrait.has-particles .portrait__img { visibility: hidden; }
-.portrait.has-particles::after { display: none; }
 
 /* ============================================================
    scroll motion (phone-first)

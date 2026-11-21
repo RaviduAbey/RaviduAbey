@@ -1,7 +1,8 @@
 /* Particle portrait
-   The hero photo is sampled into a grid of particles, coloured from its
-   brightness in the site's red. They gather into the portrait once the
-   page is ready, scatter away from the pointer, and spring back. */
+   The hero photo is sampled into a fine grid of particles in the photo's
+   own colours. They gather into the portrait once the page is ready, part
+   around the pointer and spring back, and drift away as the hero scrolls
+   out of view. Drawn straight into a pixel buffer so a fine grid stays smooth. */
 
 (() => {
   const fig = document.querySelector('[data-lens]');
@@ -17,22 +18,12 @@
 
   const root = document.documentElement;
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const BUCKETS = 24;
 
-  // brightness -> colour: deep red, signal red, then a warm highlight
-  const mix = (a, b, t) => a.map((v, i) => Math.round(v + (b[i] - v) * t));
-  const DEEP = [74, 6, 10], RED = [232, 22, 30], HOT = [255, 92, 72], LIGHT = [255, 214, 196];
-  const palette = Array.from({ length: BUCKETS }, (_, i) => {
-    const t = i / (BUCKETS - 1);
-    const c = t < 0.55 ? mix(DEEP, RED, t / 0.55) : t < 0.85 ? mix(RED, HOT, (t - 0.55) / 0.3) : mix(HOT, LIGHT, (t - 0.85) / 0.15);
-    return `rgb(${c[0]},${c[1]},${c[2]})`;
-  });
-
-  let W = 0, H = 0, dpr = 1, n = 0, size = 3;
-  let x, y, hx, hy, vx, vy, delay, sz, sdx, sdy, starts = [];
-  let scrollP = 0;
-  let raf = 0, t0 = 0, built = false;
-  const mouse = { x: -9999, y: -9999, on: false, r: 120 };
+  let W = 0, H = 0, n = 0, step = 3, dot = 2;
+  let x, y, hx, hy, vx, vy, delay, sdx, sdy, col;
+  let frame, buf;
+  let raf = 0, t0 = 0, built = false, scrollP = 0;
+  const mouse = { x: -9999, y: -9999, on: false, r: 110 };
 
   const parsePos = () => {
     const p = getComputedStyle(img).objectPosition.split(' ');
@@ -44,9 +35,11 @@
     const r = fig.getBoundingClientRect();
     W = Math.round(r.width); H = Math.round(r.height);
     if (!W || !H || !img.naturalWidth) return false;
-    dpr = Math.min(2, window.devicePixelRatio || 1);
-    canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
+    // one canvas pixel per CSS pixel keeps the buffer small; the grid is the texture
+    canvas.width = W; canvas.height = H;
     canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+    frame = ctx.createImageData(W, H);
+    buf = new Uint32Array(frame.data.buffer);
 
     // where the photo sits under object-fit: cover
     const [px, py] = parsePos();
@@ -54,103 +47,111 @@
     const dw = img.naturalWidth * s, dh = img.naturalHeight * s;
     const ox = (W - dw) * px, oy = (H - dh) * py;
 
-    const step = W < 600 ? 5 : W < 900 ? 5 : 6;
-    size = step * 0.92;
-    const cols = Math.ceil(W / step), rows = Math.ceil(H / step);
+    step = 3; dot = 2;
+    const cols = Math.floor(W / step), rows = Math.floor(H / step);
     const off = document.createElement('canvas');
     off.width = cols; off.height = rows;
     const o = off.getContext('2d', { willReadFrequently: true });
+    o.imageSmoothingQuality = 'high';
     o.drawImage(img, ox / step, oy / step, dw / step, dh / step);
     const data = o.getImageData(0, 0, cols, rows).data;
 
-    const pts = [];
+    const keep = [];
     for (let j = 0; j < rows; j++) {
       for (let i = 0; i < cols; i++) {
         const k = (j * cols + i) * 4;
-        let l = (0.299 * data[k] + 0.587 * data[k + 1] + 0.114 * data[k + 2]) / 255;
-        l = Math.min(1, Math.max(0, (l - 0.07) * 1.55));
-        if (l < 0.06) continue;
-        pts.push([i * step + step / 2, j * step + step / 2, Math.min(BUCKETS - 1, Math.floor(l * BUCKETS)), l]);
+        const l = (0.299 * data[k] + 0.587 * data[k + 1] + 0.114 * data[k + 2]) / 255;
+        if (l < 0.035) continue; // near-black: nothing to see, skip the work
+        keep.push(i, j, k);
       }
     }
-    pts.sort((a, b) => a[2] - b[2]);
-    n = pts.length;
+    n = keep.length / 3;
     x = new Float32Array(n); y = new Float32Array(n);
     hx = new Float32Array(n); hy = new Float32Array(n);
     vx = new Float32Array(n); vy = new Float32Array(n);
-    delay = new Float32Array(n); sz = new Float32Array(n);
-    sdx = new Float32Array(n); sdy = new Float32Array(n);
-    starts = new Array(BUCKETS + 1).fill(0);
-    for (let i = 0; i < n; i++) {
-      const p = pts[i];
-      hx[i] = p[0]; hy[i] = p[1];
-      sz[i] = size * (0.45 + p[3] * 0.6);
-      // where this particle drifts as the hero scrolls away: up and outward
+    delay = new Float32Array(n); sdx = new Float32Array(n); sdy = new Float32Array(n);
+    col = new Uint32Array(n);
+    const little = new Uint8Array(new Uint32Array([1]).buffer)[0] === 1;
+    for (let q = 0; q < n; q++) {
+      const i = keep[q * 3], j = keep[q * 3 + 1], k = keep[q * 3 + 2];
+      hx[q] = i * step; hy[q] = j * step;
+      // the photo's own colour, lifted a touch so it reads on the dark page
+      const rr = Math.min(255, data[k] * 1.08), gg = Math.min(255, data[k + 1] * 1.08), bb = Math.min(255, data[k + 2] * 1.08);
+      col[q] = little ? ((255 << 24) | (bb << 16) | (gg << 8) | rr) >>> 0 : ((rr << 24) | (gg << 16) | (bb << 8) | 255) >>> 0;
       const sa = -Math.PI / 2 + (Math.random() - 0.5) * Math.PI * 1.3;
       const sm = (0.25 + Math.random() * 0.85) * H * 0.55;
-      sdx[i] = Math.cos(sa) * sm + (hx[i] - W * 0.6) * 0.35;
-      sdy[i] = Math.sin(sa) * sm;
-      starts[p[2] + 1]++;
-      if (reduce || built) { x[i] = hx[i]; y[i] = hy[i]; }
+      sdx[q] = Math.cos(sa) * sm + (hx[q] - W * 0.6) * 0.35;
+      sdy[q] = Math.sin(sa) * sm;
+      if (reduce || built) { x[q] = hx[q]; y[q] = hy[q]; }
       else {
-        // a loose cloud drifting in from the right and below
         const a = Math.random() * Math.PI * 2, d = 0.35 + Math.random() * 0.9;
-        x[i] = W * 0.62 + Math.cos(a) * W * d;
-        y[i] = H * 0.55 + Math.sin(a) * H * d * 0.7;
-        delay[i] = (hy[i] / H) * 0.55 + Math.random() * 0.55;
+        x[q] = W * 0.62 + Math.cos(a) * W * d;
+        y[q] = H * 0.55 + Math.sin(a) * H * d * 0.7;
+        delay[q] = (hy[q] / H) * 0.55 + Math.random() * 0.55;
       }
     }
-    for (let b = 1; b <= BUCKETS; b++) starts[b] += starts[b - 1];
-    mouse.r = Math.max(64, Math.min(120, W * 0.11));
+    mouse.r = Math.max(60, Math.min(110, W * 0.1));
     return true;
   }
 
   function draw() {
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    ctx.clearRect(0, 0, W, H);
-    ctx.globalAlpha = 1 - scrollP * 0.75;
-    for (let b = 0; b < BUCKETS; b++) {
-      const a = starts[b], e = starts[b + 1];
-      if (a === e) continue;
-      ctx.fillStyle = palette[b];
-      for (let i = a; i < e; i++) ctx.fillRect(x[i] - sz[i] / 2, y[i] - sz[i] / 2, sz[i], sz[i]);
+    buf.fill(0);
+    const fade = 1 - scrollP * 0.8;
+    const aMul = Math.round(255 * fade);
+    const little = new Uint8Array(new Uint32Array([1]).buffer)[0] === 1;
+    for (let q = 0; q < n; q++) {
+      const px = (x[q] + 0.5) | 0, py = (y[q] + 0.5) | 0;
+      if (px < 0 || py < 0 || px >= W - dot || py >= H - dot) continue;
+      let c = col[q];
+      if (aMul < 255) {
+        // premultiplied-free alpha: just set the alpha byte
+        c = little ? ((c & 0x00ffffff) | (aMul << 24)) >>> 0 : ((c & 0xffffff00) | aMul) >>> 0;
+      }
+      const base = py * W + px;
+      buf[base] = c; buf[base + 1] = c;
+      buf[base + W] = c; buf[base + W + 1] = c;
     }
+    ctx.putImageData(frame, 0, 0);
   }
 
   function tick(now) {
     const t = (now - t0) / 1000;
     let moving = false;
-    const R = mouse.r, R2 = R * R;
-    for (let i = 0; i < n; i++) {
-      const k = t > delay[i] ? 0.055 : 0.0025;
-      const tx = hx[i] + sdx[i] * scrollP, ty = hy[i] + sdy[i] * scrollP;
-      let ax = (tx - x[i]) * k, ay = (ty - y[i]) * k;
+    const R = mouse.r, R2 = R * R, sp = scrollP;
+    for (let q = 0; q < n; q++) {
+      const k = t > delay[q] ? 0.06 : 0.0025;
+      const tx = hx[q] + sdx[q] * sp, ty = hy[q] + sdy[q] * sp;
+      let ax = (tx - x[q]) * k, ay = (ty - y[q]) * k;
       if (mouse.on) {
-        const dx = x[i] - mouse.x, dy = y[i] - mouse.y, d2 = dx * dx + dy * dy;
+        const dx = x[q] - mouse.x, dy = y[q] - mouse.y, d2 = dx * dx + dy * dy;
         if (d2 < R2 && d2 > 0.01) {
           const d = Math.sqrt(d2), f = (1 - d / R) * (1 - d / R) * 4.2;
           ax += (dx / d) * f - (dy / d) * f * 0.18;
           ay += (dy / d) * f + (dx / d) * f * 0.18;
         }
       }
-      vx[i] = (vx[i] + ax) * 0.84;
-      vy[i] = (vy[i] + ay) * 0.84;
-      x[i] += vx[i]; y[i] += vy[i];
-      if (!moving && (Math.abs(vx[i]) > 0.03 || Math.abs(vy[i]) > 0.03 || Math.abs(tx - x[i]) > 0.4 || Math.abs(ty - y[i]) > 0.4)) moving = true;
+      vx[q] = (vx[q] + ax) * 0.84;
+      vy[q] = (vy[q] + ay) * 0.84;
+      x[q] += vx[q]; y[q] += vy[q];
+      if (!moving && (vx[q] > 0.03 || vx[q] < -0.03 || vy[q] > 0.03 || vy[q] < -0.03 || Math.abs(tx - x[q]) > 0.4 || Math.abs(ty - y[q]) > 0.4)) moving = true;
+    }
+    const keepGoing = moving || mouse.on || t < 1.4;
+    if (!keepGoing) {
+      // settled: snap every particle exactly onto its spot so the grid is clean
+      for (let q = 0; q < n; q++) { x[q] = hx[q] + sdx[q] * sp; y[q] = hy[q] + sdy[q] * sp; vx[q] = 0; vy[q] = 0; }
     }
     draw();
-    if (moving || mouse.on || t < 1.4) raf = requestAnimationFrame(tick);
-    else raf = 0;
+    raf = keepGoing ? requestAnimationFrame(tick) : 0;
   }
 
-  const wake = () => { if (!raf && !reduce) raf = requestAnimationFrame(tick); };
+  const wake = () => { if (!raf && !reduce && built) raf = requestAnimationFrame(tick); };
 
   function start() {
     if (!build()) return;
     fig.classList.add('has-particles');
-    if (reduce) { draw(); built = true; return; }
-    t0 = performance.now();
     built = true;
+    if (reduce) { draw(); return; }
+    t0 = performance.now();
     raf = requestAnimationFrame(tick);
   }
 
@@ -162,7 +163,7 @@
   if (img.complete && img.naturalWidth) whenReady();
   else img.addEventListener('load', whenReady, { once: true });
 
-  // the pointer pushes particles away
+  // the pointer parts the particles
   const aim = (e) => {
     const r = canvas.getBoundingClientRect();
     mouse.x = e.clientX - r.left; mouse.y = e.clientY - r.top; mouse.on = true;
@@ -192,7 +193,7 @@
   }
 
   // rebuild on resize, keeping the settled portrait
-  let rt = 0, lastW = 0;
+  let rt = 0, lastW = fig.getBoundingClientRect().width;
   addEventListener('resize', () => {
     clearTimeout(rt);
     rt = setTimeout(() => {
@@ -203,7 +204,6 @@
       if (build()) draw();
     }, 180);
   });
-  lastW = fig.getBoundingClientRect().width;
 
   // pause work when the hero is off screen
   new IntersectionObserver(([en]) => {
