@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>The Well · Rav Abeywardana</title>
+  <meta name="description" content="Rav Abeywardana's work as a descent into a well of screens. Business and data analyst, apps and websites, Melbourne.">
+  <meta name="theme-color" content="#050404">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <meta property="og:title" content="The Well · Rav Abeywardana">
+  <meta property="og:description" content="Nine screens, one analyst. Scroll to descend.">
+  <meta property="og:image" content="https://ravabe99.pages.dev/share.jpg">
+  <link rel="preload" href="fonts/bodoni-moda-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="fonts/jost-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <style>
+    @font-face { font-family: "Bodoni Moda"; font-style: normal; font-weight: 400 900; font-display: swap; src: url("fonts/bodoni-moda-latin.woff2") format("woff2"); }
+    @font-face { font-family: "Bodoni Moda"; font-style: italic; font-weight: 400 900; font-display: swap; src: url("fonts/bodoni-moda-italic-latin.woff2") format("woff2"); }
+    @font-face { font-family: "Jost"; font-style: normal; font-weight: 100 900; font-display: swap; src: url("fonts/jost-latin.woff2") format("woff2"); }
+
+    :root {
+      --ink: #050404; --bone: #f2ede4; --bone-2: rgba(242, 237, 228, .72); --bone-3: rgba(242, 237, 228, .45);
+      --line: rgba(242, 237, 228, .16); --prussian: #003153; --prussian-hi: #2e7bbf;
+      --ease: cubic-bezier(.16, 1, .3, 1);
+      color-scheme: dark;
+    }
+    * { box-sizing: border-box; }
+    html { background: var(--ink); -webkit-text-size-adjust: 100%; }
+    body { margin: 0; background: var(--ink); color: var(--bone); font-family: "Jost", system-ui, sans-serif; font-weight: 400; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+    body.is-locked { overflow: hidden; }
+    a { color: inherit; }
+    button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+    :focus-visible { outline: 1px solid var(--bone); outline-offset: 4px; }
+    .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+    /* the scene sits behind a tall scroll track */
+    #scene { position: fixed; inset: 0; width: 100%; height: 100%; display: block; z-index: 0; }
+    .track { height: 1000vh; }
+    .track.is-short { height: 100vh; }
+
+    /* ---------- gate ---------- */
+    .gate {
+      position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; text-align: center;
+      padding: 24px; background: radial-gradient(60% 50% at 50% 60%, rgba(0, 49, 83, .35), transparent 70%), var(--ink);
+      transition: opacity 1.2s var(--ease), visibility 1.2s;
+    }
+    .gate.is-gone { opacity: 0; visibility: hidden; }
+    .gate__inner { display: grid; gap: 22px; justify-items: center; max-width: 640px; }
+    .gate__kick { margin: 0; font-size: .82rem; letter-spacing: .32em; text-transform: uppercase; color: var(--bone-3); }
+    .gate h1 { margin: 0; font-family: "Bodoni Moda", serif; font-weight: 500; font-size: clamp(2.6rem, 9vw, 5.6rem); line-height: .95; letter-spacing: -.02em; }
+    .gate h1 em { font-weight: 400; }
+    .gate p { margin: 0; color: var(--bone-2); font-weight: 300; font-size: 1.05rem; }
+    .gate__btns { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 10px; }
+    .btn {
+      min-height: 52px; padding: 0 26px; border-radius: 999px; border: 1px solid var(--line);
+      font-weight: 400; letter-spacing: .06em; font-size: .95rem;
+      transition: background-color .3s, color .3s, border-color .3s, transform .3s var(--ease);
+    }
+    .btn:hover { border-color: var(--bone); transform: translateY(-2px); }
+    .btn--solid { background: var(--bone); color: var(--ink); border-color: var(--bone); }
+    .gate__load { font-size: .78rem; color: var(--bone-3); letter-spacing: .12em; text-transform: uppercase; min-height: 1.2em; }
+    .gate__back { position: absolute; bottom: max(20px, env(safe-area-inset-bottom)); left: 0; right: 0; font-size: .85rem; color: var(--bone-3); }
+
+    /* ---------- chrome ---------- */
+    .chrome { position: fixed; z-index: 20; top: max(16px, env(safe-area-inset-top)); left: 0; right: 0; display: flex; justify-content: space-between; align-items: center; padding: 0 max(18px, env(safe-area-inset-left)); pointer-events: none; }
+    .chrome > * { pointer-events: auto; }
+    .mark { font-family: "Bodoni Moda", serif; font-style: italic; font-size: 1.5rem; text-decoration: none; }
+    .chrome__right { display: flex; gap: 8px; }
+    .icon-btn { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 16px; border-radius: 999px; border: 1px solid var(--line); background: rgba(5, 4, 4, .45); font-size: .82rem; letter-spacing: .08em; text-transform: uppercase; text-decoration: none; }
+    .icon-btn svg { width: 16px; height: 16px; }
+    .meter { position: fixed; z-index: 20; right: max(18px, env(safe-area-inset-right)); top: 50%; transform: translateY(-50%); width: 1px; height: 26vh; background: var(--line); }
+    .meter i { position: absolute; left: -1px; top: 0; width: 3px; height: 100%; background: var(--bone); transform-origin: top; transform: scaleY(var(--p, 0)); }
+
+    /* ---------- chapters (kinetic type) ---------- */
+    .chapters { position: fixed; z-index: 10; inset: 0; pointer-events: none; }
+    /* a soft dark wash behind the words, so they read over bright screens */
+    .chapters::before {
+      content: ""; position: absolute; inset: 0; opacity: 0; transition: opacity .8s var(--ease);
+      background: radial-gradient(70% 55% at 0% 100%, rgba(5, 4, 4, .82), transparent 70%);
+    }
+    .chapters.has-words::before { opacity: 1; }
+    .chapters.is-center::before { background: radial-gradient(55% 45% at 50% 50%, rgba(5, 4, 4, .7), transparent 72%); }
+    .ch {
+      position: absolute; left: max(24px, 5vw); right: 24px; bottom: max(64px, 12vh);
+      max-width: 620px; display: grid; gap: 14px;
+      text-shadow: 0 2px 30px rgba(5, 4, 4, .9);
+    }
+    .ch--center { left: 0; right: 0; margin: 0 auto; text-align: center; justify-items: center; bottom: auto; top: 50%; transform: translateY(-50%); padding: 0 24px; }
+    .ch h2, .ch .h1 { margin: 0; font-family: "Bodoni Moda", serif; font-weight: 500; font-size: clamp(2.3rem, 6.4vw, 5rem); line-height: 1; letter-spacing: -.02em; }
+    .ch .h1 { font-size: clamp(2.8rem, 8.6vw, 6.6rem); }
+    .ch em { font-style: italic; font-weight: 400; }
+    .ch p { margin: 0; color: var(--bone-2); font-weight: 300; font-size: clamp(1rem, 1.4vw, 1.15rem); max-width: 46ch; }
+    .ch .hint { font-size: .78rem; letter-spacing: .3em; text-transform: uppercase; color: var(--bone-3); }
+    .w { display: inline-block; white-space: nowrap; }
+    .l { display: inline-block; opacity: 0; transform: translateY(.5em) rotate(4deg); filter: blur(6px); transition: opacity .5s var(--ease), transform .7s var(--ease), filter .6s var(--ease); transition-delay: calc(var(--i) * 22ms); }
+    .ch.is-on .l { opacity: 1; transform: none; filter: none; }
+    .ch .fade { opacity: 0; transform: translateY(10px); transition: opacity .8s var(--ease) .35s, transform .8s var(--ease) .35s; }
+    .ch.is-on .fade { opacity: 1; transform: none; }
+    .ch:not(.is-on) .l { transition-delay: calc(var(--i) * 6ms); }
+    .ch.is-on { pointer-events: auto; }
+    .links { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 8px; }
+    .links a { min-height: 46px; display: inline-flex; align-items: center; padding: 0 20px; border-radius: 999px; border: 1px solid var(--line); text-decoration: none; letter-spacing: .04em; background: rgba(5, 4, 4, .5); transition: border-color .3s, background-color .3s; }
+    .links a:hover { border-color: var(--bone); }
+    .links a.solid { background: var(--bone); color: var(--ink); border-color: var(--bone); }
+
+    /* ---------- a screen pulled off the wall ---------- */
+    .pulled { position: fixed; z-index: 30; inset: 0; pointer-events: none; }
+    .pulled__info {
+      position: absolute; left: max(24px, 5vw); bottom: max(28px, 7vh); max-width: 380px; display: grid; gap: 10px;
+      opacity: 0; transform: translateY(14px); transition: opacity .6s var(--ease), transform .6s var(--ease);
+      text-shadow: 0 2px 24px rgba(5, 4, 4, .95);
+    }
+    .pulled.is-on .pulled__info { opacity: 1; transform: none; pointer-events: auto; transition-delay: .55s; }
+    .pulled__n { font-size: .78rem; letter-spacing: .3em; text-transform: uppercase; color: var(--bone-3); }
+    .pulled h3 { margin: 0; font-family: "Bodoni Moda", serif; font-weight: 500; font-size: clamp(1.9rem, 4vw, 2.8rem); line-height: 1.02; }
+    .pulled p { margin: 0; color: var(--bone-2); font-weight: 300; }
+    .pulled__row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 6px; }
+    .pulled__tip { font-size: .8rem; color: var(--bone-3); }
+
+    .fallback { position: fixed; inset: 0; display: none; place-items: center; text-align: center; padding: 24px; z-index: 60; background: var(--ink); }
+    .fallback.is-on { display: grid; }
+    .fallback h2 { font-family: "Bodoni Moda", serif; font-weight: 500; font-size: 2.2rem; margin: 0 0 12px; }
+
+    @media (max-width: 700px) {
+      .ch { bottom: max(52px, 10vh); }
+      .pulled__info { left: 20px; right: 20px; bottom: max(18px, 4vh); }
+      .meter { height: 18vh; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .l, .ch .fade { transition: opacity .3s linear !important; transform: none !important; filter: none !important; }
+    }
+  </style>
+  <script type="importmap">
+    { "imports": { "three": "./vendor/three.module.min.js", "three/addons/": "./vendor/addons/" } }
+  </script>
+  <script type="module" src="well.js"></script>
+</head>
+<body class="is-locked">
+  <canvas id="scene" aria-hidden="true"></canvas>
+
+  <!-- the gate: sound or no sound -->
+  <section class="gate" data-gate aria-labelledby="gate-title">
+    <div class="gate__inner">
+      <p class="gate__kick">Rav Abeywardana · Portfolio</p>
+      <h1 id="gate-title">The <em>Well</em></h1>
+      <p>Nine screens of work, spinning down into the dark. Scroll to descend, and click a screen to pull it off the wall.</p>
+      <div class="gate__btns">
+        <button class="btn btn--solid" type="button" data-enter="sound">Enter with sound</button>
+        <button class="btn" type="button" data-enter="quiet">Enter quietly</button>
+      </div>
+      <p class="gate__load" data-load aria-live="polite">Loading screens</p>
+    </div>
+    <a class="gate__back" href="/">Or see the classic portfolio</a>
+  </section>
+
+  <header class="chrome">
+    <a class="mark" href="/" aria-label="Back to the classic portfolio">Rav.</a>
+    <div class="chrome__right">
+      <button class="icon-btn" type="button" data-sound aria-pressed="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z"/><path data-wave d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/></svg>
+        <span data-sound-label>Sound off</span>
+      </button>
+    </div>
+  </header>
+  <div class="meter" aria-hidden="true"><i data-meter></i></div>
+
+  <!-- chapters: each shows over a stretch of the scroll -->
+  <div class="chapters">
+    <section class="ch" data-from="0" data-to=".075">
+      <p class="hint fade">Rav Abeywardana</p>
+      <h2 class="h1" data-kinetic>Ravidu <em>Abeywardana</em></h2>
+      <p class="fade">Business and data analyst. Apps and websites. Melbourne.</p>
+      <p class="hint fade">Scroll to descend</p>
+    </section>
+    <section class="ch" data-from=".1" data-to=".26">
+      <h2 data-kinetic>Nine screens, <em>one</em> analyst.</h2>
+      <p class="fade">Every screen on these walls is a piece of my work, playing as you scroll. Click one to pull it off the wall.</p>
+    </section>
+    <section class="ch" data-from=".3" data-to=".46">
+      <h2 data-kinetic>$2M down to <em>$20K</em>.</h2>
+      <p class="fade">Inventory discrepancies at Milwaukee Tool, traced through SAP EWM, ECC, WAMAS and Qlik until they stopped happening.</p>
+    </section>
+    <section class="ch" data-from=".5" data-to=".66">
+      <h2 data-kinetic>Sites, apps and the <em>data</em> behind them.</h2>
+      <p class="fade">Matara Express Cabs · A &amp; Jay Car &amp; Truck Rentals · inlined. · Dr. Asanka Gunawardana</p>
+    </section>
+    <section class="ch" data-from=".72" data-to=".855">
+      <h2 data-kinetic>Someone has to <em>watch</em> the numbers.</h2>
+      <p class="fade">At the bottom of the well, one screen cranks through all of it, one frame at a time.</p>
+    </section>
+    <section class="ch ch--center" data-from=".9" data-to="1.01">
+      <h2 data-kinetic>Let's <em>talk</em>.</h2>
+      <p class="fade">Analytics, apps or a website. Bring the problem; I'll bring the numbers.</p>
+      <div class="links fade">
+        <a class="solid" href="mailto:ravabe99@gmail.com?subject=Hello%20Rav">ravabe99@gmail.com</a>
+        <a href="/card/">Contact card</a>
+        <a href="/">Classic portfolio</a>
+        <a href="https://www.linkedin.com/in/raviduabey" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://www.instagram.com/ravi.abeywardana/" target="_blank" rel="noopener">Instagram</a>
+      </div>
+    </section>
+  </div>
+
+  <!-- info for a screen pulled off the wall -->
+  <div class="pulled" data-pulled aria-live="polite">
+    <div class="pulled__info">
+      <span class="pulled__n" data-pulled-n></span>
+      <h3 data-pulled-title></h3>
+      <p data-pulled-line></p>
+      <div class="pulled__row">
+        <a class="btn btn--solid" data-pulled-link href="/">Open it</a>
+        <button class="btn" type="button" data-pulled-close>Put it back</button>
+      </div>
+      <span class="pulled__tip">Scroll or drag on the screen to play it.</span>
+    </div>
+  </div>
+
+  <!-- the same nine screens as plain links, for keyboards and screen readers -->
+  <nav class="sr" aria-label="The nine screens">
+    <ul>
+      <li><a href="/#analytics">Portfolio, analytics side</a></li>
+      <li><a href="/#apps">Portfolio, apps and websites side</a></li>
+      <li><a href="/#about">About and numbers</a></li>
+      <li><a href="/#brands">Brands I've worked with</a></li>
+      <li><a href="/#skills">Skill chart</a></li>
+      <li><a href="/#work">Selected work</a></li>
+      <li><a href="/#experience">Experience</a></li>
+      <li><a href="/card/">Contact card</a></li>
+      <li><a href="/#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <div class="fallback" data-fallback>
+    <div>
+      <h2>This view needs 3D graphics</h2>
+      <p>Your browser couldn't start WebGL. The classic portfolio has all the same work.</p>
+      <p><a class="btn btn--solid" href="/" style="display:inline-flex;align-items:center;text-decoration:none">See the portfolio</a></p>
+    </div>
+  </div>
+
+  <div class="track" data-track></div>
+</body>
+</html>
