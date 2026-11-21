@@ -624,8 +624,11 @@ html.is-switching main { opacity: 0; filter: blur(6px); }
 @keyframes line-rise { from { transform: translateY(112%); } to { transform: none; } }
 
 /* ---------- particle portrait ---------- */
-.portrait__particles { position: absolute; inset: 0; z-index: 2; touch-action: pan-y; image-rendering: pixelated; }
-.portrait.has-particles .portrait__img { visibility: hidden; }
+.portrait__particles { position: absolute; inset: 0; z-index: 2; touch-action: pan-y; transition: opacity .18s ease; }
+.portrait.has-particles .portrait__img { animation: none; opacity: 0; transition: opacity .18s ease; }
+/* at rest the real photo shows; the particles only appear while something moves */
+.portrait.is-rest .portrait__img { opacity: 1; transition: opacity .6s ease; }
+.portrait.is-rest .portrait__particles { opacity: 0; transition: opacity .6s ease; }
 
 /* ============================================================
    scroll motion (phone-first)

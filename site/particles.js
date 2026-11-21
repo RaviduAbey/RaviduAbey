@@ -19,7 +19,7 @@
   const root = document.documentElement;
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  let W = 0, H = 0, n = 0, step = 3, dot = 2;
+  let W = 0, H = 0, n = 0, step = 4, dot = 3, dpr = 1;
   let x, y, hx, hy, vx, vy, delay, sdx, sdy, col;
   let frame, buf;
   let raf = 0, t0 = 0, built = false, scrollP = 0;
@@ -33,11 +33,13 @@
 
   function build() {
     const r = fig.getBoundingClientRect();
-    W = Math.round(r.width); H = Math.round(r.height);
-    if (!W || !H || !img.naturalWidth) return false;
-    // one canvas pixel per CSS pixel keeps the buffer small; the grid is the texture
+    const cw = r.width, ch = r.height;
+    if (!cw || !ch || !img.naturalWidth) return false;
+    // draw at the screen's real pixel density so dots never get resampled into a plaid
+    dpr = Math.min(3, window.devicePixelRatio || 1);
+    W = Math.round(cw * dpr); H = Math.round(ch * dpr);
     canvas.width = W; canvas.height = H;
-    canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+    canvas.style.width = cw + 'px'; canvas.style.height = ch + 'px';
     frame = ctx.createImageData(W, H);
     buf = new Uint32Array(frame.data.buffer);
 
@@ -47,7 +49,7 @@
     const dw = img.naturalWidth * s, dh = img.naturalHeight * s;
     const ox = (W - dw) * px, oy = (H - dh) * py;
 
-    step = 3; dot = 2;
+    step = Math.max(4, Math.round(4 * dpr)); dot = step - Math.max(1, Math.round(dpr));
     const cols = Math.floor(W / step), rows = Math.floor(H / step);
     const off = document.createElement('canvas');
     off.width = cols; off.height = rows;
@@ -90,7 +92,7 @@
         delay[q] = (hy[q] / H) * 0.55 + Math.random() * 0.55;
       }
     }
-    mouse.r = Math.max(60, Math.min(110, W * 0.1));
+    mouse.r = Math.max(60, Math.min(110, cw * 0.1)) * dpr;
     return true;
   }
 
@@ -107,9 +109,10 @@
         // premultiplied-free alpha: just set the alpha byte
         c = little ? ((c & 0x00ffffff) | (aMul << 24)) >>> 0 : ((c & 0xffffff00) | aMul) >>> 0;
       }
-      const base = py * W + px;
-      buf[base] = c; buf[base + 1] = c;
-      buf[base + W] = c; buf[base + W + 1] = c;
+      let row = py * W + px;
+      for (let dy = 0; dy < dot; dy++, row += W) {
+        for (let dx = 0; dx < dot; dx++) buf[row + dx] = c;
+      }
     }
     ctx.putImageData(frame, 0, 0);
   }
@@ -142,15 +145,20 @@
     }
     draw();
     raf = keepGoing ? requestAnimationFrame(tick) : 0;
+    if (!keepGoing && sp < 0.001) fig.classList.add('is-rest');
   }
 
-  const wake = () => { if (!raf && !reduce && built) raf = requestAnimationFrame(tick); };
+  const wake = () => {
+    if (!built || reduce) return;
+    fig.classList.remove('is-rest');
+    if (!raf) raf = requestAnimationFrame(tick);
+  };
 
   function start() {
     if (!build()) return;
     fig.classList.add('has-particles');
     built = true;
-    if (reduce) { draw(); return; }
+    if (reduce) { draw(); fig.classList.add('is-rest'); return; }
     t0 = performance.now();
     raf = requestAnimationFrame(tick);
   }
@@ -166,7 +174,7 @@
   // the pointer parts the particles
   const aim = (e) => {
     const r = canvas.getBoundingClientRect();
-    mouse.x = e.clientX - r.left; mouse.y = e.clientY - r.top; mouse.on = true;
+    mouse.x = (e.clientX - r.left) * dpr; mouse.y = (e.clientY - r.top) * dpr; mouse.on = true;
     wake();
   };
   fig.addEventListener('pointermove', aim);
