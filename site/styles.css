@@ -484,20 +484,6 @@ html:not(.js) .timeline::after { transform: none; }
 }
 
 @media (max-width: 900px) {
-  .nav { padding-left: 18px; }
-  .nav nav { margin-left: 0; }
-  .nav__mail { margin-left: auto; }
-  .nav__menu { display: block; }
-  .nav__links {
-    position: absolute; left: 0; right: 0; top: calc(100% + 8px);
-    flex-direction: column; gap: 0; padding: 10px;
-    background: rgba(16, 9, 10, .97); border: 1px solid var(--line); border-radius: 22px;
-    opacity: 0; visibility: hidden; transform: translateY(-8px);
-    transition: opacity .3s, transform .3s var(--ease), visibility .3s;
-  }
-  .nav__links a { width: 100%; font-size: 1.05rem; padding: 0 16px; min-height: 50px; }
-  .nav.is-open .nav__links { opacity: 1; visibility: visible; transform: none; }
-
   .hero { flex-direction: column; align-items: stretch; min-height: 0; }
   .portrait {
     position: relative; width: 100%; height: 66svh; min-height: 380px;
@@ -564,12 +550,8 @@ html[data-mode="apps"] .mode::before { transform: translateX(100%); }
 }
 .mode__btn[aria-pressed="true"] { color: #fff; }
 .mode__btn:hover { color: var(--cream); }
-.mode--hero { margin-top: 30px; }
-.mode--hero + .hero__actions { margin-top: 18px; }
 .mode--nav { margin-left: 14px; }
 .mode--nav .mode__btn { min-height: 38px; font-size: .82rem; padding: 0 1em; }
-.js .mode--hero { opacity: 0; transform: translateY(16px); }
-.is-ready .mode--hero { opacity: 1; transform: none; transition: opacity .9s var(--ease) .4s, transform .9s var(--ease) .4s; }
 
 /* the swap itself */
 main { transition: opacity .28s ease, filter .28s ease; }
@@ -607,12 +589,35 @@ html.is-switching main { opacity: 0; filter: blur(6px); }
 
 @keyframes pulse-run { to { left: 110%; } }
 
-@media (max-width: 1180px) { .mode--nav { display: none; } }
+/* below 1180px the page links fold into the menu, so the switch always has room in the bar */
+@media (max-width: 1180px) {
+  .nav { padding-left: 18px; }
+  .nav nav { margin-left: 0; }
+  .nav__mail { margin-left: auto; }
+  .nav__menu { display: block; }
+  .nav__links {
+    position: absolute; left: 0; right: 0; top: calc(100% + 8px);
+    flex-direction: column; gap: 0; padding: 10px;
+    background: rgba(16, 9, 10, .97); border: 1px solid var(--line); border-radius: 22px;
+    opacity: 0; visibility: hidden; transform: translateY(-8px);
+    transition: opacity .3s, transform .3s var(--ease), visibility .3s;
+  }
+  .nav__links a { width: 100%; font-size: 1.05rem; padding: 0 16px; min-height: 50px; }
+  .nav.is-open .nav__links { opacity: 1; visibility: visible; transform: none; }
+
+}
+.lbl-short { display: none; }
+@media (max-width: 560px) {
+  .nav { gap: 10px; }
+  .mode--nav { margin-left: 2px; padding: 3px; }
+  .mode--nav .mode__btn { min-height: 38px; padding: 0 .85em; font-size: .8rem; }
+  .lbl-long { display: none; }
+  .lbl-short { display: inline; }
+}
 @media (max-width: 1080px) { .chart--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); } .builds { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 700px) { .builds { grid-template-columns: 1fr; } }
 @media (max-width: 560px) {
   .chart--3 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .mode--hero { display: grid; width: 100%; }
   .mode__btn { padding: 0 .6em; }
 }
 @media (prefers-reduced-motion: reduce) { html.is-switching main { opacity: 1; filter: none; } }
