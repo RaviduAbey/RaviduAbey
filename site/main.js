@@ -302,7 +302,7 @@
   document.body.appendChild(bar);
 
   // headings rise in word by word as they arrive
-  const heads = reduce ? [] : $$('.h2, .contact__title > span');
+  const heads = reduce ? [] : $$('.h2:not(#about-title), .contact__title > span');
   heads.forEach((head) => {
     let k = 0;
     const wrap = (node) => {

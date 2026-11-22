@@ -244,7 +244,19 @@ html:not(.js) .intro, .intro-seen .intro { display: none; }
 .head p { max-width: 46ch; color: var(--cream-2); }
 
 /* ---------- approach ---------- */
-.approach { padding-block: clamp(120px, 22vh, 240px); }
+.approach { position: relative; }
+.approach__pin { position: relative; display: grid; align-items: center; min-height: 70svh; padding-block: clamp(120px, 22vh, 240px); overflow: hidden; }
+.js .approach.is-armed { height: 280vh; }
+.js .approach.is-armed .approach__pin { position: sticky; top: 0; height: 100svh; min-height: 0; padding-block: 0; }
+.approach__data { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: space-evenly; pointer-events: none; }
+.drow { white-space: nowrap; font-family: var(--f-mono); font-size: clamp(1.3rem, 3.6vw, 3rem); letter-spacing: -.02em; color: rgba(246, 239, 233, .05); will-change: transform; }
+.drow:nth-child(2) { color: rgba(255, 74, 61, .08); }
+.drow:nth-child(4) { color: rgba(255, 74, 61, .05); }
+.approach .wrap { position: relative; }
+.approach__text { perspective: 700px; }
+.dw { display: inline-block; transform-origin: 50% 100%; will-change: transform, opacity, filter; }
+.dw.is-live { color: var(--red-hot); font-variant-numeric: tabular-nums; }
+.approach__text em .dw.is-live { color: var(--cream); }
 .approach__text {
   max-width: 26ch;
   font-family: var(--f-display); font-weight: 600;
@@ -746,3 +758,19 @@ html.is-switching main { opacity: 0; filter: blur(6px); }
 .nav__mail .ico { width: 20px; height: 20px; }
 .nav__mail:hover { background: var(--red); color: #fff; transform: translateY(-1px) rotate(-6deg); }
 .nav__mail:active { transform: scale(.94); }
+
+/* ---------- about: words from both sides, wipes, odometer ---------- */
+.sw { display: inline-block; will-change: transform; }
+.about__body p { will-change: clip-path, transform; }
+.js .facts { border-top-color: transparent; position: relative; }
+.js .facts::before {
+  content: ""; position: absolute; left: 0; right: 0; top: -1px; height: 1px;
+  background: linear-gradient(90deg, var(--red-hot), var(--line-2) 40%);
+  transform-origin: 0 50%; transform: scaleX(var(--line, 1));
+}
+.odo { display: inline-flex; align-items: flex-end; }
+.odo__d { display: inline-block; height: 1em; overflow: hidden; }
+.odo__col { display: flex; flex-direction: column; transform: translateY(0); }
+.odo__col span { display: block; height: 1em; line-height: 1; }
+.odo-ready.is-rolled .odo__col { transform: translateY(calc(var(--to) * -1em)); transition: transform 2.2s cubic-bezier(.12, .9, .2, 1); transition-delay: calc(var(--i) * 140ms); }
+.odo__s { display: inline-block; }
