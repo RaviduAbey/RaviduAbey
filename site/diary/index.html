@@ -106,6 +106,54 @@
     .d-end { padding-bottom: clamp(80px, 10vw, 120px); color: var(--cream-2); }
     .d-end a { color: var(--cream); text-decoration: underline; text-underline-offset: 4px; }
 
+
+    /* ---------- diary entries: prints pinned to the page ---------- */
+    .entry { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(32px, 6vw, 96px); align-items: center; margin: clamp(40px, 7vw, 100px) 0 clamp(70px, 10vw, 140px); }
+    .entry__text { display: grid; gap: 16px; max-width: 52ch; }
+    .entry__date { margin: 0; font-family: var(--f-mono); font-size: .76rem; color: var(--red-hot); }
+    .entry__title { margin: 0; font-family: var(--f-display); font-weight: 700; font-size: clamp(2rem, 4.2vw, 3.4rem); line-height: 1; letter-spacing: -.04em; }
+    .entry__title em { font-size: 1.08em; letter-spacing: -.015em; }
+    .entry__text p { margin: 0; color: var(--cream-2); font-size: 1.06rem; line-height: 1.65; }
+    .entry__text q { color: var(--cream); font-style: italic; }
+    .people-title { margin: 0 0 22px; font-family: var(--f-mono); font-weight: 400; font-size: .8rem; color: var(--mute); }
+
+    .print {
+      position: relative; margin: 0; justify-self: center; width: min(100%, 420px);
+      padding: 10px 10px 52px; border-radius: 6px; background: #f6efe9;
+      box-shadow: 0 1px 0 rgba(255, 255, 255, .5) inset, 0 34px 60px -30px rgba(0, 0, 0, .95);
+      transform: rotate(var(--rot, 0deg));
+      transition: opacity 1s var(--ease), transform 1.2s var(--ease), box-shadow .4s;
+    }
+    .js .print { opacity: 0; transform: translateY(70px) rotate(calc(var(--rot, 0deg) * 4)) scale(.94); }
+    .js .print.is-in { opacity: 1; transform: rotate(var(--rot, 0deg)); }
+    .print:hover { transform: rotate(0deg) translateY(-6px) !important; box-shadow: 0 1px 0 rgba(255, 255, 255, .5) inset, 0 44px 70px -30px rgba(0, 0, 0, .95); }
+    .print::before { /* a strip of tape */
+      content: ""; position: absolute; top: -12px; left: 50%; width: 92px; height: 26px; margin-left: -46px;
+      background: rgba(246, 239, 233, .55); transform: rotate(calc(var(--rot, 0deg) * -1.6));
+      box-shadow: 0 2px 6px rgba(0, 0, 0, .25);
+    }
+    .print__frame { display: block; overflow: hidden; border-radius: 2px; background: #1c1214; }
+    .print__frame img { display: block; width: 100%; height: auto; transform: translateY(var(--py, 0px)) scale(1.1); will-change: transform; }
+    .print figcaption {
+      position: absolute; left: 14px; right: 14px; bottom: 14px;
+      font-family: var(--f-serif); font-style: italic; font-size: 1.15rem; line-height: 1.1; color: #2a1a1b;
+    }
+    .collage { position: relative; display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); align-items: start; }
+    .print--tall { width: 100%; z-index: 1; }
+    .print--wide { width: 112%; margin: 52% 0 0 -12%; z-index: 2; }
+
+    @media (max-width: 900px) {
+      .entry { grid-template-columns: 1fr; }
+      .entry .print { width: min(86%, 380px); }
+      .collage { grid-template-columns: 1fr; justify-items: center; }
+      .print--tall { width: min(74%, 330px) !important; justify-self: start; }
+      .print--wide { width: min(92%, 440px) !important; margin: 26px 0 0; justify-self: end; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .js .print, .js .print.is-in { opacity: 1; transform: rotate(var(--rot, 0deg)); transition: none; }
+      .print__frame img { transform: none; }
+    }
+
     @media (max-width: 900px) {
       .chapter__body { grid-template-columns: 1fr; gap: 18px; }
       .team { top: 84px; width: min(100%, 52svh); justify-self: center; z-index: 5; box-shadow: 0 18px 30px -12px rgba(0, 0, 0, .9); }
@@ -154,8 +202,24 @@
     <section class="chapter wrap" aria-labelledby="ch-milwaukee">
       <header class="chapter__head">
         <h2 id="ch-milwaukee" class="chapter__title">Milwaukee / TTI</h2>
-        <p class="chapter__meta">DV01, Victoria · 2025–26 · the Gala Awards</p>
+        <p class="chapter__meta">DV01, Victoria · 2025–26</p>
       </header>
+
+        <!-- ENTRY: day one -->
+        <article class="entry" aria-labelledby="e-day-one">
+          <div class="entry__text">
+            <p class="entry__date">Milwaukee / TTI · Day one · 2025</p>
+            <h3 id="e-day-one" class="entry__title">“Glad you're <em>here</em>.”</h3>
+            <p>This was waiting for me on my first day: a red jute tote, a drink bottle, a travel mug, a cap, a notebook and a pen, all in Milwaukee red. Tucked in with them was a card that said, <q>Our employees are the key to our success. We're excited to have you join our team.</q></p>
+            <p>It's a small thing, but it told me straight away how this place treats its people. I couldn't even say Milwaukee properly yet, and they'd already made room for me.</p>
+          </div>
+          <figure class="print" style="--rot:-2.5deg">
+            <span class="print__frame"><img src="img/welcome-pack.webp" alt="Milwaukee welcome pack: a red tote bag, red drink bottle, travel mug, black and red cap, red notebook, pen pouch and a welcome card" width="760" height="1351" loading="lazy"></span>
+            <figcaption>The welcome pack, day one.</figcaption>
+          </figure>
+        </article>
+
+        <h3 class="people-title">The people who made it</h3>
       <div class="chapter__body">
         <figure class="team" data-team data-map="img/milwaukee-team.json">
           <img class="team__base" src="img/milwaukee-team.jpg" alt="Georgina Wood, Rav, Jesse Smith and Niamh at the Milwaukee Gala Awards" width="1060" height="1086">
@@ -188,6 +252,26 @@
           </article>
         </div>
       </div>
+
+        <!-- ENTRY: the Gala Awards -->
+        <article class="entry entry--gala" aria-labelledby="e-gala">
+          <div class="entry__text">
+            <p class="entry__date">Milwaukee / TTI · Gala Awards · 2026</p>
+            <h3 id="e-gala" class="entry__title">A room full of <em>red</em>.</h3>
+            <p>Then came the Milwaukee Gala Awards 2026. The whole ballroom glowed Milwaukee red, from the domed ceiling down to the tables, with lasers cutting across the room above hundreds of people in suits and gowns.</p>
+            <p>We dressed up, found our table and stopped for the red-carpet photo you can see above, with Georgina, Jesse and Niamh. Looking around that room, it hit me how big the team I'd joined really was.</p>
+          </div>
+          <div class="collage">
+            <figure class="print print--tall" style="--rot:-3deg">
+              <span class="print__frame"><img src="img/gala-lasers.webp" alt="Red lasers crossing a domed ballroom ceiling above the Milwaukee Gala Awards 2026 stage and tables" width="900" height="1200" loading="lazy"></span>
+              <figcaption>Lasers over the Gala.</figcaption>
+            </figure>
+            <figure class="print print--wide" style="--rot:2.5deg">
+              <span class="print__frame"><img src="img/gala-room.webp" alt="A ballroom lit red, filled with hundreds of guests at round tables watching the stage screen" width="1400" height="934" loading="lazy"></span>
+              <figcaption>Hundreds of us, one red room.</figcaption>
+            </figure>
+          </div>
+        </article>
     </section>
 
     <section class="d-end wrap">

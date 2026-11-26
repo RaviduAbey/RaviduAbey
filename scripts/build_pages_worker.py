@@ -28,6 +28,7 @@ TYPES = {
     ".jpg": "image/jpeg",
     ".jpeg": "image/jpeg",
     ".png": "image/png",
+    ".webp": "image/webp",
     ".json": "application/json",
     ".txt": "text/plain; charset=utf-8",
     ".vcf": "text/vcard; charset=utf-8",
@@ -37,7 +38,7 @@ src = pathlib.Path(sys.argv[1])
 out = pathlib.Path(sys.argv[2])
 files = {}
 for p in sorted(src.rglob("*")):
-    if not p.is_file() or p.name in SKIP:
+    if not p.is_file() or p.name in SKIP or p.name.endswith(('.webp.json', '.png.json', '.jpg.json')):
         continue
     rel = "/" + p.relative_to(src).as_posix()
     ctype = TYPES.get(p.suffix.lower()) or mimetypes.guess_type(p.name)[0] or "application/octet-stream"

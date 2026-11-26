@@ -23,6 +23,28 @@
   const yEl = $('[data-year]');
   if (yEl) yEl.textContent = String(new Date().getFullYear());
 
+  /* ---------- prints: tilt in once, then drift inside their frames ---------- */
+  const prints = $$('.print');
+  const printIO = new IntersectionObserver((entries) => {
+    entries.forEach((en) => { if (en.isIntersecting) { en.target.classList.add('is-in'); printIO.unobserve(en.target); } });
+  }, { threshold: 0.18 });
+  prints.forEach((p) => printIO.observe(p));
+  if (!reduce && prints.length) {
+    let ticking = false;
+    const drift = () => {
+      ticking = false;
+      const vh = innerHeight;
+      prints.forEach((p) => {
+        const r = p.getBoundingClientRect();
+        if (r.bottom < 0 || r.top > vh) return;
+        const off = (r.top + r.height / 2 - vh / 2) / vh; // -1..1 across the screen
+        p.style.setProperty('--py', (off * -22).toFixed(1) + 'px');
+      });
+    };
+    addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(drift); } }, { passive: true });
+    drift();
+  }
+
   /* ---------- each chapter: one photo, its people ---------- */
   $$('.chapter').forEach(async (chapter) => {
     const team = $('[data-team]', chapter);
