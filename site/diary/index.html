@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Work diary · Rav Abeywardana</title>
+  <meta name="description" content="The people who shaped how Rav Abeywardana works, one workplace at a time.">
+  <meta name="theme-color" content="#0a0607">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="canonical" href="https://ravabe99.pages.dev/diary/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Work diary · Rav Abeywardana">
+  <meta property="og:description" content="The people who shaped how I work, one workplace at a time.">
+  <meta property="og:image" content="https://ravabe99.pages.dev/diary/img/milwaukee-team.jpg">
+  <link rel="preload" href="/fonts/bricolage-grotesque-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/styles.css">
+  <style>
+    @property --sx { syntax: '<percentage>'; inherits: true; initial-value: 50%; }
+    @property --sy { syntax: '<percentage>'; inherits: true; initial-value: 40%; }
+
+    .diary { padding-top: clamp(120px, 16vh, 170px); }
+    .d-hero { display: grid; gap: 18px; margin-bottom: clamp(56px, 8vw, 96px); }
+    .d-hero h1 { margin: 0; }
+    .d-hero p { max-width: 52ch; color: var(--cream-2); font-size: 1.1rem; }
+
+    .chapter { padding-bottom: clamp(80px, 10vw, 140px); }
+    .chapter__head { display: grid; gap: 8px; margin-bottom: clamp(28px, 4vw, 44px); padding-top: 26px; border-top: 1px solid var(--line); }
+    .chapter__title { margin: 0; font-family: var(--f-display); font-weight: 700; font-size: clamp(2.2rem, 4.8vw, 4rem); line-height: 1; letter-spacing: -.04em; }
+    .chapter__meta { margin: 0; font-family: var(--f-mono); font-size: .78rem; color: var(--mute); }
+    .chapter__body { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); gap: clamp(28px, 5vw, 72px); align-items: start; }
+
+    /* ---------- the group photo ---------- */
+    .team {
+      position: sticky; top: 96px; margin: 0;
+      border-radius: 24px; overflow: hidden; background: var(--bg-2);
+      aspect-ratio: 1060 / 1086; cursor: pointer;
+      clip-path: inset(0 0 100% 0 round 24px);
+      transition: clip-path 1.3s var(--ease);
+      -webkit-tap-highlight-color: transparent;
+    }
+    .team.is-in { clip-path: inset(0 0 0 0 round 24px); }
+    html:not(.js) .team { clip-path: none; }
+    .team img { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+    .team__base { transition: filter .8s var(--ease), transform 1.4s var(--ease); transform: scale(1.06); }
+    .team.is-in .team__base { transform: none; }
+    .team.has-pick .team__base { filter: grayscale(1) brightness(.72) contrast(1.05); }
+    .team__pick {
+      opacity: 0; transition: opacity .8s var(--ease);
+      -webkit-mask-size: 100% 100%; mask-size: 100% 100%;
+      -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+      pointer-events: none;
+    }
+    .team__pick.is-on { opacity: 1; }
+    .team__pick.is-peek { opacity: .55; }
+    .team__spot {
+      position: absolute; inset: 0; pointer-events: none; opacity: 0;
+      background: radial-gradient(circle at var(--sx) var(--sy), transparent 0 16%, rgba(5, 3, 4, .5) 62%);
+      transition: opacity .8s var(--ease), --sx .9s var(--ease), --sy .9s var(--ease);
+    }
+    .team.has-pick .team__spot { opacity: 1; }
+    /* a nameplate at the foot of the photo that slides under whoever is picked */
+    .team__tag {
+      position: absolute; left: clamp(90px, var(--tx, 50%), calc(100% - 90px)); bottom: 14px;
+      transform: translate(-50%, 12px) scale(.94); transform-origin: 50% 100%;
+      display: grid; gap: 1px; padding: 8px 14px; border-radius: 14px; white-space: nowrap; text-align: center;
+      background: rgba(10, 6, 7, .84); border: 1px solid var(--line-2);
+      -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+      opacity: 0; pointer-events: none;
+      transition: opacity .35s var(--ease), transform .45s var(--ease), left .7s var(--ease);
+    }
+    .team__tag.is-on { opacity: 1; transform: translate(-50%, 0) scale(1); }
+    .team__tag b { font-family: var(--f-display); font-weight: 700; font-size: 1.05rem; letter-spacing: -.02em; }
+    .team__tag span { font-family: var(--f-mono); font-size: .7rem; color: var(--mute); }
+    .team__tag::before { content: ""; position: absolute; left: 50%; top: -6px; width: 10px; height: 10px; margin-left: -5px; background: inherit; border-left: 1px solid var(--line-2); border-top: 1px solid var(--line-2); transform: rotate(45deg); }
+    .team__hint {
+      position: absolute; left: 50%; bottom: 16px; transform: translateX(-50%);
+      margin: 0; padding: 9px 15px; border-radius: 999px; white-space: nowrap;
+      background: rgba(10, 6, 7, .7); border: 1px solid var(--line-2); font-size: .8rem; color: var(--cream-2);
+      transition: opacity .4s;
+    }
+    .team.was-used .team__hint { opacity: 0; }
+
+    /* ---------- the people ---------- */
+    .people { display: grid; gap: clamp(18px, 3vw, 28px); padding-bottom: 20vh; }
+    .person {
+      position: relative; display: grid; gap: 12px;
+      padding: clamp(22px, 2.6vw, 30px); border-radius: 22px;
+      background: var(--bg-2); border: 1px solid var(--line);
+      cursor: pointer;
+      transition: border-color .4s, opacity .5s var(--ease), transform .6s var(--ease), background-color .4s;
+    }
+    .js .person { opacity: 0; transform: translateY(40px); }
+    .js .person.is-in { opacity: 1; transform: none; }
+    .people.has-pick .person.is-in:not(.is-on) { opacity: .45; }
+    .person.is-on { border-color: var(--red-hot); background: radial-gradient(90% 80% at 100% 0%, rgba(110, 2, 5, .45), transparent 70%), var(--bg-2); }
+    .person__name { margin: 0; }
+    .person__btn { font-family: var(--f-display); font-weight: 700; font-size: clamp(1.6rem, 2.6vw, 2.1rem); letter-spacing: -.035em; line-height: 1.05; text-align: left; color: var(--cream); }
+    .person__btn::after { content: ""; position: absolute; inset: 0; }
+    .person__role { margin: 0; font-family: var(--f-mono); font-size: .76rem; color: var(--red-hot); }
+    .person__story { margin: 0; color: var(--cream-2); font-size: 1.04rem; line-height: 1.6; }
+    .person__lesson { margin: 4px 0 0; padding-top: 14px; border-top: 1px dashed var(--line-2); display: grid; gap: 4px; }
+    .person__lesson span { font-family: var(--f-mono); font-size: .7rem; color: var(--mute); }
+    .person__lesson q { font-family: var(--f-serif); font-style: italic; font-size: clamp(1.4rem, 2.2vw, 1.8rem); line-height: 1.15; color: var(--cream); quotes: "\201C" "\201D"; }
+    .person.is-on .person__lesson q { color: var(--red-hot); }
+
+    .d-end { padding-bottom: clamp(80px, 10vw, 120px); color: var(--cream-2); }
+    .d-end a { color: var(--cream); text-decoration: underline; text-underline-offset: 4px; }
+
+    @media (max-width: 900px) {
+      .chapter__body { grid-template-columns: 1fr; gap: 18px; }
+      .team { top: 84px; width: min(100%, 52svh); justify-self: center; z-index: 5; box-shadow: 0 18px 30px -12px rgba(0, 0, 0, .9); }
+      .people { padding-bottom: 32vh; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .team, .team.is-in { clip-path: none; transition: none; }
+      .team__base { transform: none; }
+      .js .person { opacity: 1; transform: none; }
+    }
+  </style>
+  <script>document.documentElement.classList.add('js');</script>
+  <script src="diary.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <svg width="0" height="0" class="sprite" aria-hidden="true" focusable="false">
+    <symbol id="i-mail" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="m3.5 7 8.5 6 8.5-6"/></g></symbol>
+  </svg>
+
+  <header class="nav" data-nav>
+    <a class="nav__logo" href="/" aria-label="Rav Abeywardana, home">Rav<span>.</span></a>
+    <nav aria-label="Main">
+      <ul class="nav__links" id="nav-links">
+        <li><a href="/">Home</a></li>
+        <li><a href="/#brands">Brands</a></li>
+        <li><a href="/#work">Work</a></li>
+        <li><a href="/#experience">Experience</a></li>
+        <li><a href="/diary/" aria-current="page">Diary</a></li>
+        <li><a href="/#contact">Contact</a></li>
+      </ul>
+    </nav>
+    <a class="nav__mail" href="mailto:ravabe99@gmail.com?subject=Hello%20Rav" aria-label="Email Rav at ravabe99@gmail.com" title="Email me"><svg class="ico" aria-hidden="true"><use href="#i-mail"/></svg></a>
+    <button class="nav__menu" type="button" aria-expanded="false" aria-controls="nav-links" data-menu>
+      <span></span><span></span><span class="sr">Menu</span>
+    </button>
+  </header>
+
+  <main id="main" class="diary">
+    <section class="d-hero wrap">
+      <h1 class="h2">Work <em>diary</em>.</h1>
+      <p>The people who shaped how I work, one workplace at a time. Tap someone in the photo, or scroll through their stories.</p>
+    </section>
+
+    <!-- CHAPTER: one per workplace. To add a person: a mask in img/, a <img class="team__pick">, and a <article class="person">. -->
+    <section class="chapter wrap" aria-labelledby="ch-milwaukee">
+      <header class="chapter__head">
+        <h2 id="ch-milwaukee" class="chapter__title">Milwaukee / TTI</h2>
+        <p class="chapter__meta">DV01, Victoria · 2025–26 · the Gala Awards</p>
+      </header>
+      <div class="chapter__body">
+        <figure class="team" data-team data-map="img/milwaukee-team.json">
+          <img class="team__base" src="img/milwaukee-team.jpg" alt="Georgina Wood, Rav, Jesse Smith and Niamh at the Milwaukee Gala Awards" width="1060" height="1086">
+          <img class="team__pick" data-pick="georgina" src="img/milwaukee-team.jpg" alt="" style="-webkit-mask-image:url(img/mask-georgina.png);mask-image:url(img/mask-georgina.png)">
+          <img class="team__pick" data-pick="rav" src="img/milwaukee-team.jpg" alt="" style="-webkit-mask-image:url(img/mask-rav.png);mask-image:url(img/mask-rav.png)">
+          <img class="team__pick" data-pick="jesse" src="img/milwaukee-team.jpg" alt="" style="-webkit-mask-image:url(img/mask-jesse.png);mask-image:url(img/mask-jesse.png)">
+          <img class="team__pick" data-pick="niamh" src="img/milwaukee-team.jpg" alt="" style="-webkit-mask-image:url(img/mask-niamh.png);mask-image:url(img/mask-niamh.png)">
+          <span class="team__spot" aria-hidden="true"></span>
+          <span class="team__tag" data-tag aria-hidden="true"><b data-tag-name></b><span data-tag-role></span></span>
+          <p class="team__hint" aria-hidden="true">Tap someone</p>
+        </figure>
+
+        <div class="people" data-people>
+          <article class="person" data-person="georgina" data-name="Georgina Wood" data-role="Manager">
+            <h3 class="person__name"><button class="person__btn" type="button" aria-pressed="false">Georgina Wood</button></h3>
+            <p class="person__role">Manager · 2025–26</p>
+            <p class="person__story">Showed me how to manage people, and the practical tactics of management. Basically guided my entire Milwaukee career.</p>
+            <p class="person__lesson"><span>What I took from it</span><q>Always give them 3 chances. 1, 2, 3.</q></p>
+          </article>
+          <article class="person" data-person="jesse" data-name="Jesse Smith" data-role="Leading Hand">
+            <h3 class="person__name"><button class="person__btn" type="button" aria-pressed="false">Jesse Smith</button></h3>
+            <p class="person__role">Leading Hand · 2025–26</p>
+            <p class="person__story">Showed me the ropes and helped me navigate Milwaukee when I couldn't even pronounce the brand name right.</p>
+            <p class="person__lesson"><span>What I took from it</span><q>Bunch of M18s stealing my stuff.</q></p>
+          </article>
+          <article class="person" data-person="niamh" data-name="Niamh" data-role="Team Leader">
+            <h3 class="person__name"><button class="person__btn" type="button" aria-pressed="false">Niamh</button></h3>
+            <p class="person__role">Team Leader · 2025–26</p>
+            <p class="person__story">Showed me how to handle hard situations that involve people.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="d-end wrap">
+      <p>More chapters on the way. Until then, <a href="/#experience">see where I've worked</a>.</p>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <div class="wrap foot__inner">
+      <p>© <span data-year>2026</span> Ravidu Sadaruwan Abeywardana</p>
+      <p>Melbourne, Victoria · References on request</p>
+    </div>
+  </footer>
+</body>
+</html>
